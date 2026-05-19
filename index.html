@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>koaland.ai · Intelligence OS · Outreach</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/png" href="koaland-logo.png">
+<script>if(localStorage.getItem("theme")==="dark")document.documentElement.classList.add("dark");</script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+/* ── Sidebar overrides for outreach nav ──────────────────── */
+.nav-section-lbl { padding: 14px 14px 6px; font-size: 9.5px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255,255,255,0.32); pointer-events: none; }
+.sidebar:not(.open) .nav-section-lbl { opacity: 0; height: 0; padding: 0; overflow: hidden; }
+.sidebar.open .nav-section-lbl { opacity: 1; }
+.nav-badge { margin-left: auto; background: rgba(99,102,241,0.25); color: #c7d2fe; font-size: 10.5px; font-weight: 800; padding: 1px 8px; border-radius: 999px; min-width: 22px; text-align: center; }
+.nav-badge:empty, .nav-badge.zero { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.25); }
+.sidebar:not(.open) .nav-badge { display: none; }
+.sidebar-foot-brand { padding: 16px 14px 12px; }
+.sidebar-foot-brand .nav-label { display: block; }
+.sidebar-foot-name { font-size: 9.5px; font-weight: 800; letter-spacing: 1.3px; color: rgba(255,255,255,0.42); margin-bottom: 4px; }
+.sidebar-foot-tag { font-size: 11px; color: rgba(255,255,255,0.32); line-height: 1.45; font-weight: 400; }
+.nav-back { opacity: 0.55; }
+.nav-back:hover { opacity: 1; }
+
+/* ── Status pills in header ───────────────────────────────── */
+.status-pills { display: flex; align-items: center; gap: 8px; }
+.status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px; font-size: 11.5px; font-weight: 600; background: #f4f4f8; border: 1px solid #ececf2; color: #6b7280; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: #d1d5db; }
+.status-dot.ok { background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,0.45); }
+.status-dot.warn { background: #f59e0b; box-shadow: 0 0 6px rgba(245,158,11,0.4); }
+.status-dot.err { background: #ef4444; }
+.followup-pill { background: #fff7ed; border: 1px solid #fed7aa; color: #ea580c; font-weight: 700; }
+.followup-pill .count { font-weight: 800; color: #c2410c; }
+.btn-add-prospect { display: inline-flex; align-items: center; gap: 5px; background: #6366F1; color: #fff; font-size: 12px; font-weight: 700; padding: 7px 14px; border-radius: 8px; cursor: pointer; transition: all 160ms; border: none; }
+.btn-add-prospect:hover { background: #4F46E5; box-shadow: 0 4px 12px rgba(99,102,241,0.35); transform: translateY(-1px); }
+
+/* ── KPI strip ────────────────────────────────────────────── */
+.kpi-strip { display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; margin-bottom: 20px; }
+.kpi-tile { background: #fff; border: 1px solid #ebebeb; border-radius: 12px; padding: 14px 16px; transition: all 160ms; }
+.kpi-tile:hover { box-shadow: 0 6px 18px rgba(0,0,0,0.06); transform: translateY(-1px); }
+.kpi-tile-lbl { font-size: 10px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; }
+.kpi-tile-val { font-size: 22px; font-weight: 800; color: #111827; letter-spacing: -0.4px; line-height: 1; }
+.kpi-tile-val.accent { color: #6366F1; }
+.kpi-tile-val.gold { color: #b45309; }
+.kpi-tile-val.green { color: #059669; }
+.kpi-tile-val.red { color: #dc2626; }
+html.dark .kpi-tile { background: #1a1b2e; border-color: #252840; }
+html.dark .kpi-tile-val { color: #f1f5f9; }
+
+/* ── Section panels ───────────────────────────────────────── */
+.panel { background: #fff; border: 1px solid #ebebeb; border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+html.dark .panel { background: #1a1b2e; border-color: #252840; }
+.panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.panel-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #111827; }
+.panel-title svg { color: #6366F1; }
+html.dark .panel-title { color: #f1f5f9; }
+.panel-sub { font-size: 12px; color: #9ca3af; }
+
+/* ── Priority queue task card ─────────────────────────────── */
+.task-card { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; padding: 14px 16px; border: 1px solid #ececf2; border-radius: 11px; background: #fafbfd; transition: all 160ms; margin-bottom: 8px; }
+.task-card:last-child { margin-bottom: 0; }
+.task-card:hover { border-color: #6366F1; box-shadow: 0 4px 14px rgba(99,102,241,0.1); }
+html.dark .task-card { background: #14152a; border-color: #252840; }
+.task-icon { width: 36px; height: 36px; border-radius: 9px; background: rgba(99,102,241,0.12); color: #6366F1; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.task-body .task-title { font-size: 13.5px; font-weight: 700; color: #111827; margin-bottom: 3px; }
+html.dark .task-body .task-title { color: #f1f5f9; }
+.task-body .task-meta { font-size: 12px; color: #6b7280; line-height: 1.55; }
+.task-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+.task-btn { font-size: 11.5px; font-weight: 600; padding: 6px 11px; border-radius: 7px; cursor: pointer; transition: all 160ms; border: 1px solid transparent; }
+.task-btn-primary { background: #6366F1; color: #fff; }
+.task-btn-primary:hover { background: #4F46E5; }
+.task-btn-ghost { background: transparent; border-color: #e5e7eb; color: #6b7280; }
+.task-btn-ghost:hover { background: #f4f4f8; color: #111827; border-color: #d1d5db; }
+.task-due { font-size: 10.5px; font-weight: 700; padding: 3px 8px; border-radius: 5px; background: #fef9c3; color: #a16207; letter-spacing: 0.3px; }
+
+/* ── Warm signal prospect cards ───────────────────────────── */
+.prospect-row { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid #ececf2; border-radius: 10px; margin-bottom: 8px; transition: all 160ms; }
+.prospect-row:last-child { margin-bottom: 0; }
+.prospect-row:hover { border-color: #6366F1; background: rgba(99,102,241,0.03); }
+html.dark .prospect-row { border-color: #252840; }
+.prospect-name { font-size: 13.5px; font-weight: 700; color: #111827; margin-bottom: 2px; }
+html.dark .prospect-name { color: #f1f5f9; }
+.prospect-meta { font-size: 11.5px; color: #6b7280; display: flex; align-items: center; gap: 6px; }
+.prospect-badge { font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 5px; letter-spacing: 0.2px; }
+.prospect-badge.audit-ready { background: #dcfce7; color: #166534; }
+.prospect-badge.research { background: #dbeafe; color: #1d4ed8; }
+.prospect-badge.audit-progress { background: #fef9c3; color: #a16207; }
+.prospect-badge.sent { background: #ede9fe; color: #6d28d9; }
+.signal-bar { display: flex; align-items: center; gap: 8px; }
+.signal-dot { width: 8px; height: 8px; border-radius: 50%; }
+.signal-dot.warming { background: #fb923c; box-shadow: 0 0 6px rgba(251,146,60,0.5); }
+.signal-dot.hot { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.5); }
+.signal-dot.cold { background: #cbd5e1; }
+.signal-label { font-size: 11.5px; font-weight: 700; color: #9ca3af; letter-spacing: 0.2px; }
+.signal-score { font-size: 12px; font-weight: 800; color: #111827; }
+html.dark .signal-score { color: #f1f5f9; }
+
+/* ── Pipeline column ──────────────────────────────────────── */
+.split-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
+@media (max-width: 1100px) { .split-grid { grid-template-columns: 1fr; } }
+.pipeline-list { display: flex; flex-direction: column; gap: 1px; background: #f1f5f9; border-radius: 9px; overflow: hidden; }
+html.dark .pipeline-list { background: #252840; }
+.pipeline-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #fff; font-size: 12.5px; font-weight: 500; color: #6b7280; transition: background 150ms; cursor: default; }
+.pipeline-row:hover { background: #fafbfd; color: #111827; }
+html.dark .pipeline-row { background: #1a1b2e; color: #94a3b8; }
+html.dark .pipeline-row:hover { background: #14152a; color: #f1f5f9; }
+.pipeline-count { font-size: 13px; font-weight: 800; color: #111827; min-width: 24px; text-align: right; }
+.pipeline-count.zero { color: #cbd5e1; }
+html.dark .pipeline-count { color: #f1f5f9; }
+html.dark .pipeline-count.zero { color: #475569; }
+
+/* ── Activity feed ────────────────────────────────────────── */
+.activity-empty { text-align: center; padding: 32px 16px; color: #9ca3af; font-size: 12.5px; }
+.activity-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 0; border-bottom: 1px solid #f3f4f6; }
+.activity-item:last-child { border-bottom: none; }
+.activity-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; background: #6366F1; }
+.activity-text { font-size: 12.5px; color: #374151; line-height: 1.55; }
+.activity-time { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+html.dark .activity-text { color: #cbd5e1; }
+html.dark .activity-item { border-bottom-color: #252840; }
+
+/* ── Themes chips ─────────────────────────────────────────── */
+.theme-chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 8px; background: #f4f4f8; color: #374151; font-size: 12px; font-weight: 600; margin-right: 6px; margin-bottom: 6px; border: 1px solid #ececf2; }
+.theme-chip .count { background: rgba(99,102,241,0.14); color: #4338ca; font-weight: 800; padding: 1px 7px; border-radius: 99px; font-size: 11px; }
+html.dark .theme-chip { background: #14152a; border-color: #252840; color: #cbd5e1; }
+html.dark .theme-chip .count { background: rgba(99,102,241,0.22); color: #c7d2fe; }
+
+/* ── Add Prospect modal ───────────────────────────────────── */
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); z-index: 500; align-items: center; justify-content: center; padding: 24px; }
+.modal-bg.open { display: flex; }
+.modal-card { background: #fff; border-radius: 18px; padding: 28px; width: 100%; max-width: 480px; box-shadow: 0 24px 60px rgba(0,0,0,0.2); animation: modalIn 220ms cubic-bezier(.22,1,.36,1); }
+html.dark .modal-card { background: #1a1b2e; }
+@keyframes modalIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+.modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.modal-head h3 { font-size: 16px; font-weight: 800; color: #111827; }
+html.dark .modal-head h3 { color: #f1f5f9; }
+.modal-close { width: 28px; height: 28px; border-radius: 7px; background: #f4f4f8; color: #6b7280; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 150ms; border: none; font-size: 18px; line-height: 1; }
+.modal-close:hover { background: #e5e7eb; color: #111827; }
+.form-row { margin-bottom: 14px; }
+.form-row label { display: block; font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.form-row input, .form-row select { width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; color: #111827; background: #fff; outline: none; transition: border-color 150ms; }
+.form-row input:focus, .form-row select:focus { border-color: #6366F1; box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
+html.dark .form-row input, html.dark .form-row select { background: #14152a; border-color: #252840; color: #f1f5f9; }
+.form-row input::placeholder { color: #cbd5e1; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+.btn { padding: 10px 18px; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 160ms; border: 1px solid transparent; }
+.btn-primary { background: #6366F1; color: #fff; }
+.btn-primary:hover { background: #4F46E5; box-shadow: 0 6px 16px rgba(99,102,241,0.35); }
+.btn-secondary { background: transparent; border-color: #e5e7eb; color: #6b7280; }
+.btn-secondary:hover { background: #f4f4f8; color: #111827; }
+html.dark .btn-secondary { border-color: #252840; color: #94a3b8; }
+
+/* ── Empty state ──────────────────────────────────────────── */
+.empty-state { text-align: center; padding: 36px 16px; color: #9ca3af; font-size: 12.5px; }
+.empty-state svg { color: #cbd5e1; margin-bottom: 10px; }
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 1200px) {
+  .kpi-strip { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 900px) {
+  .header { padding: 0 14px; gap: 8px; }
+  .status-pills { display: none; }
+  .followup-pill { display: none; }
+  .content { padding: 16px; }
+  .kpi-strip { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .split-grid { grid-template-columns: 1fr !important; }
+  .panel { padding: 16px; }
+  /* Email studio: stack 3 variants */
+  .content > div[style*="grid-template-columns:repeat(3,1fr)"] { grid-template-columns: 1fr !important; }
+  /* Audit score grid: 2 cols */
+  .panel div[style*="grid-template-columns:repeat(4,1fr)"] { grid-template-columns: repeat(2,1fr) !important; }
+  /* Audit opps: stack */
+  .panel div[style*="grid-template-columns:repeat(3,1fr)"] { grid-template-columns: 1fr !important; }
+  /* Prospect radar filters: stack */
+  .panel div[style*="grid-template-columns:repeat(4,1fr)"][style*="gap:12px"] { grid-template-columns: 1fr 1fr !important; }
+  /* Prospects table: horizontal scroll */
+  table { display: block; overflow-x: auto; white-space: nowrap; }
+}
+@media (max-width: 600px) {
+  .header { height: auto; padding: 10px 12px; flex-wrap: wrap; }
+  .kpi-strip { grid-template-columns: 1fr 1fr; }
+  .task-card { grid-template-columns: 1fr; }
+  .task-actions { flex-wrap: wrap; }
+  .prospect-row { grid-template-columns: 1fr; gap: 6px; }
+}
+
+/* ── Toast (reused from index) ────────────────────────────── */
+.toast { position: fixed; bottom: 24px; right: 24px; background: #111827; color: #fff; padding: 12px 18px; border-radius: 10px; font-size: 13px; display: flex; align-items: center; gap: 8px; box-shadow: 0 12px 32px rgba(0,0,0,0.25); z-index: 2000; }
+.toast.success { background: #059669; }
+.toast.info { background: #6366F1; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar open" id="sidebar">
+    <div class="sidebar-top">
+      <button onclick="toggleSidebar()" class="sidebar-logo-btn" title="Menu" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;">
+        <img src="koaland-logo.png" class="sidebar-logo-img" width="26" height="26" alt="koaland.ai">
+      </button>
+      <div class="sidebar-brand-wrap">
+        <span class="sidebar-brand">
+          <span style="color:#fff;font-weight:800;letter-spacing:-0.3px">koaland</span><span style="color:#fff;font-weight:800">.ai</span>
+        </span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-lbl"><span class="nav-label">Daily Operations</span></div>
+      <a href="#" onclick="navOutreach('command-center', this); return false;" class="nav-link active" data-screen="command-center"><i data-lucide="layout-dashboard"></i><span class="nav-label">Command Center</span></a>
+      <a href="#" onclick="navOutreach('prospect-radar', this); return false;" class="nav-link"><i data-lucide="radar"></i><span class="nav-label">Prospect Radar</span></a>
+      <a href="#" onclick="navOutreach('prospects', this); return false;" class="nav-link"><i data-lucide="users"></i><span class="nav-label">Prospects</span></a>
+
+      <div class="nav-section-lbl"><span class="nav-label">Intelligence</span></div>
+      <a href="#" onclick="navOutreach('audit-workspace', this); return false;" class="nav-link"><i data-lucide="file-search"></i><span class="nav-label">Audit Workspace</span></a>
+      <a href="#" onclick="navOutreach('email-studio', this); return false;" class="nav-link"><i data-lucide="sparkles"></i><span class="nav-label">Email Studio</span></a>
+
+      <div class="nav-section-lbl"><span class="nav-label">Operations</span></div>
+      <a href="#" onclick="navOutreach('campaigns', this); return false;" class="nav-link"><i data-lucide="megaphone"></i><span class="nav-label">Campaigns</span></a>
+      <a href="#" onclick="navOutreach('followup-queue', this); return false;" class="nav-link">
+        <i data-lucide="bell"></i><span class="nav-label">Follow-up Queue</span>
+        <span class="nav-badge" id="nav-fu-badge">0</span>
+      </a>
+      <a href="#" onclick="navOutreach('analytics', this); return false;" class="nav-link"><i data-lucide="trending-up"></i><span class="nav-label">Analytics</span></a>
+
+      <div class="nav-section-lbl"><span class="nav-label">System</span></div>
+      <a href="#" onclick="navOutreach('settings', this); return false;" class="nav-link"><i data-lucide="settings"></i><span class="nav-label">Settings</span></a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="sidebar-foot-brand">
+        <span class="nav-label">
+          <div class="sidebar-foot-name">KOALAND.AI</div>
+          <div class="sidebar-foot-tag">Commercial decision engine for brand-sensitive hotels</div>
+        </span>
+      </div>
+      <a href="index.html" class="nav-link nav-back"><i data-lucide="arrow-left"></i><span class="nav-label">Back to koaland.ai</span></a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <a href="index.html" class="header-logo-link" style="display:flex;align-items:center;gap:8px;">
+          <img src="koaland-logo.png" class="header-logo-img" width="22" height="22" alt="koaland.ai">
+          <span class="header-logo-text" style="font-size:15px;font-weight:800;color:#111827;letter-spacing:-0.3px;">
+            <span class="logo-word">koaland</span><span class="logo-dot" style="color:#6366F1;">.ai</span>
+          </span>
+        </a>
+        <span class="header-divider">|</span>
+        <div class="header-hotel">
+          <i data-lucide="radar" style="width:14px;height:14px;color:#6366F1"></i>
+          <span style="font-weight:700;">Intelligence OS</span>
+          <span style="color:#9ca3af;font-weight:400;">· Outbound cockpit</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="status-pills">
+          <div class="status-pill"><span class="status-dot ok" id="st-backend"></span> Backend</div>
+          <div class="status-pill"><span class="status-dot ok" id="st-sendgrid"></span> SendGrid</div>
+          <div class="status-pill"><span class="status-dot ok" id="st-openai"></span> OpenAI</div>
+        </div>
+        <div class="status-pill followup-pill"><span class="count" id="hdr-fu-count">0</span> follow-ups due</div>
+        <button class="btn-add-prospect" onclick="openAddProspect()"><i data-lucide="plus" style="width:13px;height:13px;"></i> Add Prospect</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- Page header -->
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:6px;">
+        <div>
+          <div style="font-size:10.5px;font-weight:800;letter-spacing:1.4px;color:#6366F1;text-transform:uppercase;margin-bottom:2px;">Daily Operations</div>
+          <div class="page-title">Command Center</div>
+          <div class="page-sub" style="margin-bottom:0;">Your outbound intelligence cockpit for today.</div>
+        </div>
+        <button class="btn-secondary" style="display:flex;align-items:center;gap:6px;" onclick="refreshAll()">
+          <i data-lucide="refresh-cw" style="width:13px;height:13px;"></i> Refresh
+        </button>
+      </div>
+
+      <div style="height:18px"></div>
+
+      <!-- KPI strip -->
+      <div class="kpi-strip">
+        <div class="kpi-tile"><div class="kpi-tile-lbl">Prospects</div><div class="kpi-tile-val" id="k-prospects">2</div></div>
+        <div class="kpi-tile"><div class="kpi-tile-lbl">A-Tier</div><div class="kpi-tile-val accent" id="k-atier">1</div></div>
+        <div class="kpi-tile"><div class="kpi-tile-lbl">Audits</div><div class="kpi-tile-val gold" id="k-audits">1</div></div>
+        <div class="kpi-tile"><div class="kpi-tile-lbl">Emails Sent</div><div class="kpi-tile-val" id="k-sent">0</div></div>
+        <div class="kpi-tile"><div class="kpi-tile-lbl">Opened</div><div class="kpi-tile-val" id="k-opened">0</div></div>
+        <div class="kpi-tile"><div class="kpi-tile-lbl">PDF Views</div><div class="kpi-tile-val" id="k-pdf">0</div></div>
+        <div class="kpi-tile"><div class="kpi-tile-lbl">Replies</div><div class="kpi-tile-val green" id="k-replies">0</div></div>
+        <div class="kpi-tile"><div class="kpi-tile-lbl">Hot Leads</div><div class="kpi-tile-val red" id="k-hot">0</div></div>
+      </div>
+
+      <!-- Two column split -->
+      <div class="split-grid">
+
+        <!-- LEFT: Priority Queue + Warm Signal Engine -->
+        <div>
+          <!-- Priority Queue -->
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title">
+                <i data-lucide="zap" style="width:16px;height:16px;"></i>
+                Today's Priority Queue
+              </div>
+              <span class="panel-sub" id="pq-count">1 task</span>
+            </div>
+            <div id="pq-list">
+              <div class="task-card">
+                <div class="task-icon"><i data-lucide="send" style="width:18px;height:18px;"></i></div>
+                <div class="task-body">
+                  <div class="task-title">Send initial outreach to Villa Ariadne</div>
+                  <div class="task-meta">Audit complete · Commercial upside <b>84</b> · Angle: <b>Direct Booking Clarity</b></div>
+                </div>
+                <div class="task-actions">
+                  <span class="task-due">Today</span>
+                  <button class="task-btn task-btn-primary" onclick="goToEmailStudio('va')">Open Email Studio</button>
+                  <button class="task-btn task-btn-ghost" onclick="markDone(this)">Mark Done</button>
+                  <button class="task-btn task-btn-ghost" onclick="snoozeTask(this)">+1 Day</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Warm Signal Engine -->
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title">
+                <i data-lucide="flame" style="width:16px;height:16px;color:#f59e0b;"></i>
+                Warm Signal Engine
+              </div>
+              <span class="panel-sub">Hottest prospects ranked by engagement signals</span>
+            </div>
+            <div id="warm-list">
+              <div class="prospect-row" onclick="openProspect('villa-ariadne')">
+                <div>
+                  <div class="prospect-name">Villa Ariadne Boutique Hotel</div>
+                  <div class="prospect-meta">
+                    <i data-lucide="map-pin" style="width:11px;height:11px;color:#9ca3af;"></i>
+                    Santorini, Greece
+                    <span style="color:#cbd5e1;">·</span>
+                    <span class="prospect-badge audit-ready">Audit Ready</span>
+                    <span style="color:#cbd5e1;">·</span>
+                    just now
+                  </div>
+                </div>
+                <div class="signal-bar">
+                  <span class="signal-dot warming"></span>
+                  <span class="signal-label">Warming</span>
+                </div>
+                <div class="signal-score">30</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title">
+                <i data-lucide="activity" style="width:16px;height:16px;"></i>
+                Recent Activity
+              </div>
+              <span class="panel-sub">Live signal stream</span>
+            </div>
+            <div id="activity-feed">
+              <div class="activity-empty">No activity yet. Add a prospect to start the intelligence stream.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Pipeline + Themes -->
+        <div>
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title">
+                <i data-lucide="git-branch" style="width:16px;height:16px;"></i>
+                Pipeline
+              </div>
+              <span class="panel-sub">Funnel by stage</span>
+            </div>
+            <div class="pipeline-list">
+              <div class="pipeline-row"><span>Research Queue</span><span class="pipeline-count" id="p-rq">1</span></div>
+              <div class="pipeline-row"><span>Researching</span><span class="pipeline-count zero" id="p-rs">0</span></div>
+              <div class="pipeline-row"><span>Research Complete</span><span class="pipeline-count zero" id="p-rc">0</span></div>
+              <div class="pipeline-row"><span>Audit In Progress</span><span class="pipeline-count zero" id="p-ap">0</span></div>
+              <div class="pipeline-row"><span>Audit Ready</span><span class="pipeline-count" id="p-ar">1</span></div>
+              <div class="pipeline-row"><span>Email Drafted</span><span class="pipeline-count zero" id="p-ed">0</span></div>
+              <div class="pipeline-row"><span>Sent</span><span class="pipeline-count zero" id="p-sent">0</span></div>
+              <div class="pipeline-row"><span>Delivered</span><span class="pipeline-count zero" id="p-del">0</span></div>
+              <div class="pipeline-row"><span>Opened</span><span class="pipeline-count zero" id="p-op">0</span></div>
+              <div class="pipeline-row"><span>PDF Viewed</span><span class="pipeline-count zero" id="p-pv">0</span></div>
+              <div class="pipeline-row"><span>Replied</span><span class="pipeline-count zero" id="p-rep">0</span></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title">
+                <i data-lucide="sparkles" style="width:16px;height:16px;"></i>
+                Opportunity Themes
+              </div>
+              <span class="panel-sub">Aggregated from audits</span>
+            </div>
+            <div>
+              <div class="theme-chip">Quick Win <span class="count">1</span></div>
+              <div class="theme-chip">Strategic Fix <span class="count">0</span></div>
+              <div class="theme-chip">Commercial Risk <span class="count">0</span></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title">
+                <i data-lucide="target" style="width:16px;height:16px;"></i>
+                Top Angles This Week
+              </div>
+            </div>
+            <div style="font-size:12.5px;color:#374151;line-height:1.85;">
+              <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f3f4f6;">
+                <span style="font-weight:600;">Direct Booking Clarity</span><span style="color:#6366F1;font-weight:800;">1</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f3f4f6;color:#9ca3af;">
+                <span>AI Search Readiness</span><span>0</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:6px 0;color:#9ca3af;">
+                <span>Quiet Founder Note</span><span>0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <footer class="app-footer">
+      <span>Research</span><span class="app-footer-dot">·</span><span>Audit</span><span class="app-footer-dot">·</span><span>Score</span><span class="app-footer-dot">·</span><span>Outreach</span><span class="app-footer-dot">·</span><span>Track</span>
+    </footer>
+  </div>
+</div>
+
+<!-- Add Prospect Modal -->
+<div class="modal-bg" id="modal-bg" onclick="if(event.target===this)closeAddProspect()">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>Add Prospect</h3>
+      <button class="modal-close" onclick="closeAddProspect()" aria-label="Close">×</button>
+    </div>
+    <form id="prospect-form" onsubmit="submitProspect(event)">
+      <div class="form-row">
+        <label>Hotel Name</label>
+        <input type="text" id="p-name" placeholder="Villa Ariadne Boutique Hotel" required />
+      </div>
+      <div class="form-row">
+        <label>Location</label>
+        <input type="text" id="p-loc" placeholder="Santorini, Greece" required />
+      </div>
+      <div class="form-row">
+        <label>Website</label>
+        <input type="url" id="p-url" placeholder="https://villaariadne.com" />
+      </div>
+      <div class="form-row">
+        <label>Source</label>
+        <select id="p-src">
+          <option>Direct discovery</option>
+          <option>Referral</option>
+          <option>Conference / Event</option>
+          <option>Cold outbound</option>
+          <option>Inbound inquiry</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeAddProspect()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Add to Queue</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast" style="display:none;"></div>
+
+<script>
+lucide.createIcons();
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.className = 'toast ' + type;
+  t.innerHTML = `<i data-lucide="${type==='success'?'check-circle':'info'}" style="width:16px;height:16px;flex-shrink:0;"></i> ${msg}`;
+  t.style.display = 'flex'; lucide.createIcons();
+  clearTimeout(window._tt); window._tt = setTimeout(()=>t.style.display='none', 3000);
+}
+
+function openAddProspect(){ document.getElementById('modal-bg').classList.add('open'); setTimeout(()=>document.getElementById('p-name').focus(), 60); }
+function closeAddProspect(){ document.getElementById('modal-bg').classList.remove('open'); document.getElementById('prospect-form').reset(); }
+
+function submitProspect(e){
+  e.preventDefault();
+  const name = document.getElementById('p-name').value.trim();
+  const loc  = document.getElementById('p-loc').value.trim();
+  if (!name || !loc) return;
+  // Persist to global state
+  const id = 'p_' + Date.now().toString(36);
+  MOCK_PROSPECTS.push({ id, name, loc, rooms:0, stage:'Research Queue', signal:5, signalType:'cold', upside:null, angle:null, last:'just now' });
+  saveProspects();
+  // If currently on Command Center, refresh visible cockpit numbers
+  const kp = document.getElementById('k-prospects');
+  if (kp) kp.textContent = parseInt(kp.textContent) + 1;
+  const rq = document.getElementById('p-rq');
+  if (rq) { rq.textContent = parseInt(rq.textContent) + 1; rq.classList.remove('zero'); }
+  const list = document.getElementById('warm-list');
+  if (list) {
+    const row = document.createElement('div');
+    row.className = 'prospect-row';
+    row.innerHTML = `
+      <div>
+        <div class="prospect-name">${name}</div>
+        <div class="prospect-meta">
+          <i data-lucide="map-pin" style="width:11px;height:11px;color:#9ca3af;"></i>
+          ${loc} <span style="color:#cbd5e1;">·</span>
+          <span class="prospect-badge research">Research Queue</span>
+          <span style="color:#cbd5e1;">·</span> just now
+        </div>
+      </div>
+      <div class="signal-bar"><span class="signal-dot cold"></span><span class="signal-label">Cold</span></div>
+      <div class="signal-score">5</div>`;
+    list.appendChild(row);
+  }
+  addActivity(`<b>${name}</b> added to research queue · ${loc}`);
+  closeAddProspect();
+  showToast(`${name} added to queue`, 'success');
+  lucide.createIcons();
+}
+
+function addActivity(html){
+  const feed = document.getElementById('activity-feed');
+  if (feed.querySelector('.activity-empty')) feed.innerHTML = '';
+  const item = document.createElement('div');
+  item.className = 'activity-item';
+  item.innerHTML = `<div class="activity-dot"></div><div><div class="activity-text">${html}</div><div class="activity-time">just now</div></div>`;
+  feed.insertBefore(item, feed.firstChild);
+}
+
+function openProspect(id){
+  const p = MOCK_PROSPECTS.find(x => x.id === id);
+  if (p) { SELECTED_PROSPECT_ID = id; goToScreen('audit-workspace'); }
+  else showToast('Prospect not found', 'info');
+}
+function goToEmailStudio(id){
+  if (id) SELECTED_PROSPECT_ID = id;
+  goToScreen('email-studio');
+}
+function goToScreen(screen){
+  const link = document.querySelector(`.sidebar-nav .nav-link[data-screen="${screen}"], .sidebar-nav .nav-link[onclick*="'${screen}'"]`);
+  navOutreach(screen, link);
+}
+function addRadarProspect(name, loc){
+  // Actually persist to MOCK_PROSPECTS
+  if (MOCK_PROSPECTS.find(p => p.name === name)) { showToast(`${name} is already in your pipeline`, 'info'); return; }
+  const id = 'r_' + Date.now().toString(36);
+  MOCK_PROSPECTS.push({ id, name, loc, rooms:0, stage:'Research Queue', signal:5, signalType:'cold', upside:null, angle:null, last:'just now' });
+  saveProspects();
+  showToast(`${name} added to pipeline`, 'success');
+}
+function markDone(btn){
+  const card = btn.closest('.task-card');
+  card.style.transition = 'opacity 250ms';
+  card.style.opacity = '0';
+  setTimeout(()=>{
+    card.remove();
+    const list = document.getElementById('pq-list');
+    if (!list.children.length) list.innerHTML = '<div class="empty-state"><i data-lucide="check-circle-2" style="width:28px;height:28px;"></i><div>All clear today. Add a prospect to generate the next priority.</div></div>';
+    lucide.createIcons();
+    document.getElementById('pq-count').textContent = list.querySelectorAll('.task-card').length + ' task' + (list.querySelectorAll('.task-card').length === 1 ? '' : 's');
+    addActivity('Priority task marked done · Villa Ariadne');
+  }, 260);
+  showToast('Task completed', 'success');
+}
+function snoozeTask(btn){
+  const due = btn.closest('.task-card').querySelector('.task-due');
+  if (due) { due.textContent = 'Tomorrow'; due.style.background = '#dbeafe'; due.style.color = '#1d4ed8'; }
+  showToast('Snoozed to tomorrow', 'info');
+}
+// Capture Command Center HTML on first load
+let __ccHTML = null;
+window.addEventListener('DOMContentLoaded', () => { __ccHTML = document.querySelector('.content').innerHTML; });
+
+// Mock data shared across screens (persisted to localStorage)
+const STORE_KEY = 'koaland_outreach_prospects';
+const DEFAULT_PROSPECTS = [
+  { id:'va', name:'Villa Ariadne Boutique Hotel', loc:'Santorini, Greece', rooms:24, stage:'Audit Ready', signal:30, signalType:'warming', upside:84, angle:'Direct Booking Clarity', last:'just now' },
+  { id:'mh', name:'Mandolin House', loc:'Mykonos, Greece', rooms:18, stage:'Research Queue', signal:5, signalType:'cold', upside:null, angle:null, last:'2 days ago' },
+];
+function loadProspects(){
+  try { const raw = localStorage.getItem(STORE_KEY); return raw ? JSON.parse(raw) : [...DEFAULT_PROSPECTS]; }
+  catch { return [...DEFAULT_PROSPECTS]; }
+}
+function saveProspects(){ localStorage.setItem(STORE_KEY, JSON.stringify(MOCK_PROSPECTS)); }
+let MOCK_PROSPECTS = loadProspects();
+let SELECTED_PROSPECT_ID = MOCK_PROSPECTS.find(p => p.stage === 'Audit Ready')?.id || MOCK_PROSPECTS[0]?.id || 'va';
+function selectedProspect(){ return MOCK_PROSPECTS.find(p => p.id === SELECTED_PROSPECT_ID) || MOCK_PROSPECTS[0] || DEFAULT_PROSPECTS[0]; }
+const MOCK_CAMPAIGNS = [
+  { name:'Greek Islands · Spring 2026', segment:'Boutique resorts 15-30 rooms', prospects:8, sent:0, opened:0, replies:0, status:'Drafting' },
+  { name:'Maldives Premium Villas', segment:'Overwater 40+ villas', prospects:4, sent:0, opened:0, replies:0, status:'Paused' },
+  { name:'DACH City Boutique', segment:'Munich · Berlin · Hamburg · Vienna', prospects:6, sent:0, opened:0, replies:0, status:'Drafting' },
+];
+
+function navOutreach(screen, el){
+  document.querySelectorAll('.sidebar-nav .nav-link').forEach(a => a.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const renderers = {
+    'command-center':  renderCommandCenter,
+    'prospect-radar':  renderProspectRadar,
+    'prospects':       renderProspects,
+    'audit-workspace': renderAuditWorkspace,
+    'email-studio':    renderEmailStudio,
+    'campaigns':       renderCampaigns,
+    'followup-queue':  renderFollowupQueue,
+    'analytics':       renderAnalytics,
+    'settings':        renderSettings,
+  };
+  (renderers[screen] || renderCommandCenter)();
+  document.querySelector('.content').scrollTop = 0;
+  lucide.createIcons();
+}
+
+function renderCommandCenter(){
+  if (__ccHTML) document.querySelector('.content').innerHTML = __ccHTML;
+  // Re-activate Command Center in nav
+  document.querySelectorAll('.sidebar-nav .nav-link').forEach(a => a.classList.remove('active'));
+  document.querySelector('.sidebar-nav .nav-link[href="outreach.html"]')?.classList.add('active');
+}
+
+function pageHeader(eyebrow, title, sub, rightHTML=''){
+  return `<div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:6px;">
+    <div>
+      <div style="font-size:10.5px;font-weight:800;letter-spacing:1.4px;color:#6366F1;text-transform:uppercase;margin-bottom:2px;">${eyebrow}</div>
+      <div class="page-title">${title}</div>
+      <div class="page-sub" style="margin-bottom:0;">${sub}</div>
+    </div>
+    ${rightHTML}
+  </div><div style="height:20px"></div>`;
+}
+
+// ── PROSPECT RADAR ─────────────────────────────────────────
+function renderProspectRadar(){
+  const candidates = [
+    { name:'Aria Sanctuary, Bodrum', loc:'Turkey · Aegean', rooms:32, brand:'Boutique resort', signal:78, why:'Top-quartile reviews, weak schema markup, OTA-heavy distribution' },
+    { name:'Casa di Mare', loc:'Italy · Amalfi Coast', rooms:21, brand:'Cliffside boutique', signal:71, why:'No structured data, premium positioning, Italian-only site' },
+    { name:'Estate Lavanda', loc:'Croatia · Hvar', rooms:14, brand:'Estate villa', signal:69, why:'Niche luxury, no booking engine optimisation, growing DACH search' },
+    { name:'Maison Lumière', loc:'France · Provence', rooms:18, brand:'Vineyard hotel', signal:65, why:'Strong brand, fragmented digital presence, Q3 demand window' },
+    { name:'The Iris House', loc:'UK · Cotswolds', rooms:11, brand:'Manor estate', signal:62, why:'Premium ADR potential, no FAQ schema, weak mobile experience' },
+    { name:'Atoll Lily Resort', loc:'Maldives · Baa Atoll', rooms:42, brand:'Overwater villas', signal:58, why:'Strong inventory, slow page speed, missing review structured data' },
+  ];
+  document.querySelector('.content').innerHTML = `
+    ${pageHeader('Discovery', 'Prospect Radar', 'Source new luxury hotels by signal strength and commercial fit.')}
+    <div class="panel" style="margin-bottom:16px;">
+      <div class="panel-head"><div class="panel-title"><i data-lucide="search" style="width:16px;height:16px;"></i> Discovery filters</div></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+        <div class="form-row" style="margin:0;"><label>Region</label><select><option>All</option><option>Mediterranean</option><option>DACH</option><option>UK &amp; Ireland</option><option>Maldives &amp; Indian Ocean</option><option>Caribbean</option></select></div>
+        <div class="form-row" style="margin:0;"><label>Hotel type</label><select><option>All</option><option>Boutique resort</option><option>Design hotel</option><option>Overwater villa</option><option>Estate / Manor</option><option>City boutique</option></select></div>
+        <div class="form-row" style="margin:0;"><label>Min rooms</label><input type="number" value="10" min="1" /></div>
+        <div class="form-row" style="margin:0;"><label>Brand-sensitivity</label><select><option>All tiers</option><option>Premium</option><option>Luxury</option><option>Ultra-luxury</option></select></div>
+      </div>
+      <div style="margin-top:12px;display:flex;justify-content:flex-end;gap:8px;"><button class="btn btn-secondary" onclick="showToast('Filters reset','info')">Reset</button><button class="btn btn-primary" onclick="showToast('Searching commercial radar...','info')">Run Discovery</button></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title"><i data-lucide="radar" style="width:16px;height:16px;"></i> Candidates (${candidates.length})</div><span class="panel-sub">Ranked by composite commercial fit</span></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px;">
+        ${candidates.map(c => `
+          <div style="border:1px solid #ececf2;border-radius:11px;padding:16px;background:#fafbfd;transition:all 160ms;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+              <div>
+                <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:2px;">${c.name}</div>
+                <div style="font-size:11.5px;color:#6b7280;display:flex;align-items:center;gap:4px;"><i data-lucide="map-pin" style="width:11px;height:11px;color:#9ca3af;"></i>${c.loc}</div>
+              </div>
+              <div style="text-align:right;"><div style="font-size:18px;font-weight:800;color:#6366F1;line-height:1;">${c.signal}</div><div style="font-size:9.5px;color:#9ca3af;text-transform:uppercase;letter-spacing:0.5px;">fit</div></div>
+            </div>
+            <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+              <span style="font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:5px;background:#ede9fe;color:#6d28d9;">${c.brand}</span>
+              <span style="font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:5px;background:#dbeafe;color:#1d4ed8;">${c.rooms} rooms</span>
+            </div>
+            <div style="font-size:11.5px;color:#6b7280;line-height:1.6;margin-bottom:12px;">${c.why}</div>
+            <button class="btn btn-primary" style="width:100%;font-size:12px;padding:8px;" onclick="addRadarProspect('${c.name.replace(/'/g, "\\'")}', '${c.loc}')"><i data-lucide="plus" style="width:12px;height:12px;"></i> Add to Pipeline</button>
+          </div>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ── PROSPECTS LIST ─────────────────────────────────────────
+function renderProspects(){
+  document.querySelector('.content').innerHTML = `
+    ${pageHeader('Pipeline', 'Prospects', 'Every hotel you are tracking, sorted by signal strength.', `<button class="btn-add-prospect" onclick="openAddProspect()"><i data-lucide="plus" style="width:13px;height:13px;"></i> Add Prospect</button>`)}
+    <div class="panel">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+        <input type="text" placeholder="Search prospects..." style="flex:1;min-width:200px;padding:9px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;outline:none;" />
+        <select style="padding:9px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;background:#fff;"><option>All stages</option><option>Research Queue</option><option>Audit Ready</option><option>Email Drafted</option><option>Sent</option><option>Opened</option><option>Replied</option></select>
+        <select style="padding:9px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;background:#fff;"><option>All signals</option><option>Hot</option><option>Warming</option><option>Cold</option></select>
+      </div>
+      <table style="width:100%;border-collapse:separate;border-spacing:0;font-size:13px;">
+        <thead><tr style="text-align:left;font-size:10.5px;font-weight:800;letter-spacing:0.6px;color:#9ca3af;text-transform:uppercase;border-bottom:1px solid #ececf2;">
+          <th style="padding:10px 0;">Hotel</th><th style="padding:10px 0;">Location</th><th style="padding:10px 0;">Rooms</th><th style="padding:10px 0;">Stage</th><th style="padding:10px 0;">Signal</th><th style="padding:10px 0;">Last Activity</th><th style="padding:10px 0;text-align:right;">Actions</th>
+        </tr></thead>
+        <tbody>
+          ${MOCK_PROSPECTS.map(p => `
+            <tr style="border-bottom:1px solid #f3f4f6;">
+              <td style="padding:14px 8px 14px 0;font-weight:700;color:#111827;">${p.name}</td>
+              <td style="padding:14px 8px;color:#6b7280;">${p.loc}</td>
+              <td style="padding:14px 8px;color:#6b7280;">${p.rooms}</td>
+              <td style="padding:14px 8px;"><span class="prospect-badge audit-ready" style="${p.stage !== 'Audit Ready' ? 'background:#dbeafe;color:#1d4ed8;' : ''}">${p.stage}</span></td>
+              <td style="padding:14px 8px;"><span class="signal-bar"><span class="signal-dot ${p.signalType}"></span><span class="signal-score" style="font-size:13px;">${p.signal}</span></span></td>
+              <td style="padding:14px 8px;color:#9ca3af;">${p.last}</td>
+              <td style="padding:14px 0 14px 8px;text-align:right;">
+                <button class="task-btn task-btn-ghost" onclick="showToast('Opening ${p.name}','info')">Open</button>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ── AUDIT WORKSPACE ────────────────────────────────────────
+function prospectSelector(){
+  return `<select onchange="SELECTED_PROSPECT_ID=this.value; navOutreach(document.querySelector('.sidebar-nav .nav-link.active')?.dataset.screen || 'audit-workspace');" style="padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:12.5px;background:#fff;font-weight:600;color:#111827;cursor:pointer;">
+    ${MOCK_PROSPECTS.map(p => `<option value="${p.id}" ${p.id === SELECTED_PROSPECT_ID ? 'selected' : ''}>${p.name}</option>`).join('')}
+  </select>`;
+}
+
+function renderAuditWorkspace(){
+  const p = selectedProspect();
+  const isReady = p.stage === 'Audit Ready' || p.upside;
+  const scores = [
+    { lbl:'Website Experience', val:54, color:'#fb923c' },
+    { lbl:'SEO Readiness', val:42, color:'#fb923c' },
+    { lbl:'AEO Readiness', val:28, color:'#ef4444' },
+    { lbl:'GEO Readiness', val:24, color:'#ef4444' },
+    { lbl:'Direct Booking Clarity', val:48, color:'#fb923c' },
+    { lbl:'Luxury Brand Consistency', val:68, color:'#10b981' },
+    { lbl:'Commercial Upside', val:p.upside || 84, color:'#6366F1' },
+    { lbl:'Confidence', val:76, color:'#10b981' },
+  ];
+  const findings = [
+    { sev:'high',   title:'Direct booking CTA buried below the fold', impact:'Guests default to OTA bookings. 15-22% commission lost per reservation.' },
+    { sev:'high',   title:'No hotel schema markup',                   impact:'Invisible in AI-assisted booking journeys (ChatGPT, Google AI).' },
+    { sev:'medium', title:'Mobile experience below luxury standard',  impact:'60%+ of luxury travelers research on mobile. Losing them at the booking step.' },
+    { sev:'medium', title:'No FAQ / experience content for AI queries', impact:'AI assistants find nothing to cite when guests ask about the property.' },
+  ];
+  const opps = [
+    { type:'Quick Win',        title:'Direct booking CTA repositioning', impact:'High',      effort:'Low',    urgency:'Immediate' },
+    { type:'Strategic Fix',    title:'Hotel schema implementation',      impact:'High',      effort:'Medium', urgency:'30 days' },
+    { type:'Commercial Risk',  title:'OTA commission recapture',         impact:'Very High', effort:'Medium', urgency:'This quarter' },
+  ];
+  const rightHTML = `<div style="display:flex;gap:8px;align-items:center;">${prospectSelector()}<button class="btn btn-secondary" onclick="showToast('PDF export queued','info')"><i data-lucide="file-text" style="width:13px;height:13px;"></i> Export PDF</button><button class="btn btn-primary" onclick="goToEmailStudio()"><i data-lucide="sparkles" style="width:13px;height:13px;"></i> Generate Email</button></div>`;
+  if (!isReady) {
+    document.querySelector('.content').innerHTML = pageHeader('Intelligence', 'Audit Workspace', `${p.name} · ${p.loc}`, rightHTML) + `
+      <div class="panel" style="text-align:center;padding:80px 24px;">
+        <div style="display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:14px;background:rgba(99,102,241,0.12);color:#6366F1;margin:0 auto 16px;"><i data-lucide="search" style="width:24px;height:24px;"></i></div>
+        <h3 style="font-size:18px;font-weight:800;color:#111827;margin-bottom:8px;">No audit yet for ${p.name}</h3>
+        <p style="color:#6b7280;font-size:13px;max-width:480px;margin:0 auto 24px;line-height:1.7;">Prospect is in the <b>${p.stage}</b> stage. Run a commercial audit to surface findings and generate an outreach angle.</p>
+        <button class="btn btn-primary" onclick="runAudit('${p.id}')"><i data-lucide="play" style="width:13px;height:13px;"></i> Run Audit Now</button>
+      </div>`;
+    return;
+  }
+  document.querySelector('.content').innerHTML = `
+    ${pageHeader('Intelligence', 'Audit Workspace', `${p.name} · ${p.loc}`, rightHTML)}
+    <div class="panel" style="margin-bottom:16px;">
+      <div class="panel-head"><div class="panel-title"><i data-lucide="gauge" style="width:16px;height:16px;"></i> Commercial Score Card</div><span class="panel-sub">Generated 2 minutes ago</span></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+        ${scores.map(s => `
+          <div style="border:1px solid #ececf2;border-radius:10px;padding:14px;">
+            <div style="font-size:10.5px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;">${s.lbl}</div>
+            <div style="display:flex;align-items:flex-end;gap:6px;margin-bottom:8px;"><div style="font-size:22px;font-weight:800;color:${s.color};line-height:1;">${s.val}</div><div style="font-size:11px;color:#9ca3af;padding-bottom:2px;">/100</div></div>
+            <div style="height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden;"><div style="height:100%;width:${s.val}%;background:${s.color};border-radius:3px;"></div></div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:16px;">
+      <div class="panel-head"><div class="panel-title"><i data-lucide="file-text" style="width:16px;height:16px;"></i> Executive Summary</div></div>
+      <p style="font-size:13px;line-height:1.78;color:#374151;">Villa Ariadne presents a compelling luxury brand that is significantly underserved by its digital presence. The property's direct booking capability is undermined by poor CTA hierarchy and absent AI-readable structured data, creating systematic commercial leakage to OTA channels. The commercial upside for a properly positioned digital presence is substantial. <b style="color:#111827;">Recommended outreach angle: Direct Booking Clarity.</b></p>
+    </div>
+
+    <div class="panel" style="margin-bottom:16px;">
+      <div class="panel-head"><div class="panel-title"><i data-lucide="alert-triangle" style="width:16px;height:16px;color:#f59e0b;"></i> Top Findings</div></div>
+      ${findings.map(f => `
+        <div style="display:flex;gap:14px;padding:14px;border:1px solid #ececf2;border-radius:10px;margin-bottom:8px;background:#fafbfd;">
+          <span style="font-size:10px;font-weight:800;padding:3px 9px;border-radius:5px;letter-spacing:0.4px;text-transform:uppercase;height:fit-content;${f.sev==='high'?'background:#fee2e2;color:#b91c1c;':'background:#fef9c3;color:#a16207;'}">${f.sev}</span>
+          <div><div style="font-size:13.5px;font-weight:700;color:#111827;margin-bottom:4px;">${f.title}</div><div style="font-size:12px;color:#6b7280;line-height:1.65;">${f.impact}</div></div>
+        </div>`).join('')}
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title"><i data-lucide="target" style="width:16px;height:16px;color:#059669;"></i> Opportunities</div></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+        ${opps.map(o => `
+          <div style="border:1px solid #ececf2;border-radius:10px;padding:16px;background:#fff;">
+            <span style="display:inline-block;font-size:10px;font-weight:800;padding:3px 9px;border-radius:5px;letter-spacing:0.4px;text-transform:uppercase;background:rgba(99,102,241,0.12);color:#4338ca;margin-bottom:10px;">${o.type}</span>
+            <div style="font-size:13.5px;font-weight:700;color:#111827;margin-bottom:10px;">${o.title}</div>
+            <div style="font-size:11.5px;color:#6b7280;line-height:1.7;">Impact: <b style="color:#111827;">${o.impact}</b><br>Effort: <b style="color:#111827;">${o.effort}</b><br>Urgency: <b style="color:#111827;">${o.urgency}</b></div>
+          </div>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ── EMAIL STUDIO ───────────────────────────────────────────
+function renderEmailStudio(){
+  const p = selectedProspect();
+  const cityHint = p.loc?.split(',')[0]?.trim() || 'your region';
+  const variants = [
+    {
+      name:'Precision · Direct Booking', angle:'Direct Booking Clarity',
+      subject:`Quick note on ${p.name}'s booking flow`,
+      body:`Hi,\n\nI was looking at ${p.name}'s website this week, specifically at how guests move from discovery to booking.\n\nThe property and offering are clearly premium. But the path to a direct reservation has a few friction points that are pushing guests toward OTA instead.\n\nI've put together a short audit with the two or three specific changes that would have the biggest impact on direct booking conversion. No fluff, just findings and what they mean commercially.\n\nWould it be useful to share it with you?\n\nBest,\nMurat\nKoaland.ai`,
+      strength:{ personalization:82, clarity:90, hook:85, spam:'low' },
+      why:'Opens with a specific observation, not a pitch. "Direct reservation" signals commercial awareness without being salesy.',
+      tone:'#6366F1'
+    },
+    {
+      name:'AI Angle · Search Visibility', angle:'AI Search Readiness',
+      subject:`What ChatGPT says about ${p.name}`,
+      body:`Hi,\n\nI ran ${p.name} through the AI search assistants that luxury travelers are increasingly using to plan stays. ChatGPT, Perplexity, Google AI Overviews.\n\nThe results were interesting. The property barely surfaces, and when it does, the description doesn't match your actual positioning.\n\nThis is fixable, and it's a gap worth closing before competitors in ${cityHint} get there first.\n\nI've documented exactly what the AI systems see (and don't see) about ${p.name}. Happy to share the findings.\n\nBest,\nMurat\nKoaland.ai`,
+      strength:{ personalization:88, clarity:85, hook:90, spam:'low' },
+      why:'AI search angle is novel and specific. Very few hotels have heard this framing.',
+      tone:'#0891b2'
+    },
+    {
+      name:'Quiet Founder · Peer to Peer', angle:'Quiet Founder Note',
+      subject:p.name,
+      body:`Hi,\n\nI run a small company that helps independent hotels strengthen their digital presence, specifically around direct bookings and AI search visibility.\n\n${p.name} caught my attention. The positioning is right, but the digital presence isn't fully expressing it, which means some of the value you're creating isn't converting into direct bookings.\n\nI'm not selling a platform or a retainer. I do focused, founder-led audits and then specific implementation.\n\nIf you're open to a look, I can share what I found.\n\nBest,\nMurat\nKoaland.ai`,
+      strength:{ personalization:75, clarity:92, hook:72, spam:'very-low' },
+      why:'"Not selling a platform" disarms immediately. Founder-to-founder framing creates peer respect.',
+      tone:'#059669'
+    },
+  ];
+  const rightHTML = `<div style="display:flex;gap:8px;align-items:center;">${prospectSelector()}<button class="btn btn-primary" onclick="showToast('Regenerating with new tone...','info')"><i data-lucide="refresh-cw" style="width:13px;height:13px;"></i> Regenerate</button></div>`;
+  document.querySelector('.content').innerHTML = `
+    ${pageHeader('Intelligence', 'Email Studio', `${p.name} · Three angles generated · Pick one to send.`, rightHTML)}
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+      ${variants.map((v,i) => `
+        <div class="panel" style="margin:0;padding:18px;border-top:3px solid ${v.tone};">
+          <div style="font-size:10.5px;font-weight:800;color:${v.tone};text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;">${v.angle}</div>
+          <div style="font-size:14.5px;font-weight:800;color:#111827;margin-bottom:14px;line-height:1.3;">${v.name}</div>
+          <div style="font-size:10.5px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Subject</div>
+          <div style="font-size:12.5px;color:#111827;font-weight:600;padding:9px 12px;background:#f4f4f8;border-radius:7px;margin-bottom:14px;">${v.subject}</div>
+          <div style="font-size:10.5px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Body</div>
+          <div style="font-size:12.5px;color:#374151;line-height:1.7;white-space:pre-wrap;padding:12px;background:#fafbfd;border-radius:7px;border:1px solid #ececf2;margin-bottom:14px;max-height:300px;overflow-y:auto;">${v.body}</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px;">
+            <div style="text-align:center;padding:7px 4px;background:#f4f4f8;border-radius:6px;"><div style="font-size:9.5px;color:#9ca3af;letter-spacing:0.3px;text-transform:uppercase;font-weight:700;">Personal</div><div style="font-size:13px;font-weight:800;color:${v.tone};">${v.strength.personalization}</div></div>
+            <div style="text-align:center;padding:7px 4px;background:#f4f4f8;border-radius:6px;"><div style="font-size:9.5px;color:#9ca3af;letter-spacing:0.3px;text-transform:uppercase;font-weight:700;">Clarity</div><div style="font-size:13px;font-weight:800;color:${v.tone};">${v.strength.clarity}</div></div>
+            <div style="text-align:center;padding:7px 4px;background:#f4f4f8;border-radius:6px;"><div style="font-size:9.5px;color:#9ca3af;letter-spacing:0.3px;text-transform:uppercase;font-weight:700;">Hook</div><div style="font-size:13px;font-weight:800;color:${v.tone};">${v.strength.hook}</div></div>
+            <div style="text-align:center;padding:7px 4px;background:#f4f4f8;border-radius:6px;"><div style="font-size:9.5px;color:#9ca3af;letter-spacing:0.3px;text-transform:uppercase;font-weight:700;">Spam</div><div style="font-size:11px;font-weight:800;color:#059669;">${v.strength.spam}</div></div>
+          </div>
+          <div style="font-size:11.5px;color:#6b7280;line-height:1.6;margin-bottom:14px;font-style:italic;">${v.why}</div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-primary" style="flex:1;padding:9px;font-size:12px;" onclick="showToast('${v.name} queued for send','success')"><i data-lucide="send" style="width:12px;height:12px;"></i> Send</button>
+            <button class="btn btn-secondary" style="padding:9px 12px;font-size:12px;" onclick="showToast('Opened in editor','info')"><i data-lucide="edit-3" style="width:12px;height:12px;"></i></button>
+          </div>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+// ── CAMPAIGNS ──────────────────────────────────────────────
+function renderCampaigns(){
+  document.querySelector('.content').innerHTML = `
+    ${pageHeader('Operations', 'Campaigns', 'Sequenced outbound campaigns by segment and timing.', `<button class="btn btn-primary" onclick="showToast('New campaign builder coming','info')"><i data-lucide="plus" style="width:13px;height:13px;"></i> New Campaign</button>`)}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;">
+      ${MOCK_CAMPAIGNS.map(c => `
+        <div class="panel" style="margin:0;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
+            <div style="font-size:14.5px;font-weight:800;color:#111827;line-height:1.3;">${c.name}</div>
+            <span style="font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:5px;background:${c.status==='Drafting'?'#fef9c3':'#f4f4f8'};color:${c.status==='Drafting'?'#a16207':'#6b7280'};">${c.status}</span>
+          </div>
+          <div style="font-size:12px;color:#6b7280;margin-bottom:14px;line-height:1.5;">${c.segment}</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">
+            <div style="text-align:center;padding:8px 4px;background:#f4f4f8;border-radius:7px;"><div style="font-size:9.5px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">Prospects</div><div style="font-size:15px;font-weight:800;color:#111827;">${c.prospects}</div></div>
+            <div style="text-align:center;padding:8px 4px;background:#f4f4f8;border-radius:7px;"><div style="font-size:9.5px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">Sent</div><div style="font-size:15px;font-weight:800;color:#111827;">${c.sent}</div></div>
+            <div style="text-align:center;padding:8px 4px;background:#f4f4f8;border-radius:7px;"><div style="font-size:9.5px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">Opened</div><div style="font-size:15px;font-weight:800;color:#111827;">${c.opened}</div></div>
+            <div style="text-align:center;padding:8px 4px;background:#f4f4f8;border-radius:7px;"><div style="font-size:9.5px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">Replies</div><div style="font-size:15px;font-weight:800;color:#059669;">${c.replies}</div></div>
+          </div>
+          <button class="btn btn-secondary" style="width:100%;" onclick="showToast('Opening ${c.name}','info')">Open Campaign</button>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+// ── FOLLOW-UP QUEUE ────────────────────────────────────────
+function renderFollowupQueue(){
+  document.querySelector('.content').innerHTML = `
+    ${pageHeader('Operations', 'Follow-up Queue', 'Daily-triaged follow-ups, ranked by warm-signal score.')}
+    <div class="panel" style="margin-bottom:16px;">
+      <div style="display:flex;gap:8px;margin-bottom:0;flex-wrap:wrap;">
+        <button class="task-btn task-btn-primary">Today (0)</button>
+        <button class="task-btn task-btn-ghost">Tomorrow (0)</button>
+        <button class="task-btn task-btn-ghost">This Week (0)</button>
+        <button class="task-btn task-btn-ghost">Overdue (0)</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div style="text-align:center;padding:60px 24px;">
+        <div style="display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:14px;background:rgba(16,185,129,0.12);color:#059669;margin:0 auto 16px;">
+          <i data-lucide="check-circle-2" style="width:24px;height:24px;"></i>
+        </div>
+        <h3 style="font-size:16px;font-weight:800;color:#111827;margin-bottom:8px;">Inbox zero</h3>
+        <p style="color:#6b7280;font-size:13px;max-width:380px;margin:0 auto;line-height:1.7;">No follow-ups due. Once you send your first outreach, replies and reminders will land here ranked by warm-signal score.</p>
+      </div>
+    </div>
+  `;
+}
+
+// ── ANALYTICS ──────────────────────────────────────────────
+function renderAnalytics(){
+  const funnel = [
+    { lbl:'Prospects',     val:2,  w:100 },
+    { lbl:'Audited',       val:1,  w:50 },
+    { lbl:'Email Drafted', val:0,  w:0 },
+    { lbl:'Sent',          val:0,  w:0 },
+    { lbl:'Opened',        val:0,  w:0 },
+    { lbl:'Replied',       val:0,  w:0 },
+  ];
+  document.querySelector('.content').innerHTML = `
+    ${pageHeader('Operations', 'Analytics', 'Outreach performance, open rates, and reply patterns.')}
+    <div class="kpi-strip" style="grid-template-columns:repeat(4,1fr);">
+      <div class="kpi-tile"><div class="kpi-tile-lbl">Total sent</div><div class="kpi-tile-val">0</div></div>
+      <div class="kpi-tile"><div class="kpi-tile-lbl">Open rate</div><div class="kpi-tile-val accent">0%</div></div>
+      <div class="kpi-tile"><div class="kpi-tile-lbl">Reply rate</div><div class="kpi-tile-val green">0%</div></div>
+      <div class="kpi-tile"><div class="kpi-tile-lbl">Hot leads</div><div class="kpi-tile-val red">0</div></div>
+    </div>
+    <div class="panel" style="margin-bottom:16px;">
+      <div class="panel-head"><div class="panel-title"><i data-lucide="bar-chart-3" style="width:16px;height:16px;"></i> Outreach Funnel</div><span class="panel-sub">Conversion at each stage</span></div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${funnel.map((f,i) => `
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px;"><span style="color:#374151;font-weight:600;">${f.lbl}</span><span style="color:#9ca3af;font-weight:700;">${f.val}</span></div>
+            <div style="height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden;"><div style="height:100%;width:${f.w}%;background:linear-gradient(90deg,#6366F1,#818CF8);border-radius:4px;"></div></div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title"><i data-lucide="trending-up" style="width:16px;height:16px;"></i> Best Performing Angle</div></div>
+      <div style="text-align:center;padding:36px 24px;color:#9ca3af;font-size:12.5px;">Send at least 5 emails to see angle-level performance breakdowns.</div>
+    </div>
+  `;
+}
+
+// ── SETTINGS ───────────────────────────────────────────────
+function renderSettings(){
+  document.querySelector('.content').innerHTML = `
+    ${pageHeader('System', 'Settings', 'API connections, sender identity and integrations.')}
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;">
+
+      <div class="panel" style="margin:0;">
+        <div class="panel-head"><div class="panel-title"><i data-lucide="server" style="width:16px;height:16px;"></i> Backend Connection</div></div>
+        <div class="form-row"><label>API Base URL</label><input type="url" value="https://koaland-os.vercel.app" /></div>
+        <div class="form-row"><label>Access Token</label><input type="password" value="••••••••••••••••" /></div>
+        <button class="btn btn-primary" style="width:100%;" onclick="showToast('Connection verified','success')">Test Connection</button>
+      </div>
+
+      <div class="panel" style="margin:0;">
+        <div class="panel-head"><div class="panel-title"><i data-lucide="mail" style="width:16px;height:16px;"></i> SendGrid</div></div>
+        <div class="form-row"><label>API Key</label><input type="password" value="••••••••••••••••" /></div>
+        <div class="form-row"><label>Sender Name</label><input type="text" value="Murat Sezen" /></div>
+        <div class="form-row"><label>Sender Email</label><input type="email" value="grow@koalityconsultant.com" /></div>
+      </div>
+
+      <div class="panel" style="margin:0;">
+        <div class="panel-head"><div class="panel-title"><i data-lucide="sparkles" style="width:16px;height:16px;"></i> OpenAI</div></div>
+        <div class="form-row"><label>API Key</label><input type="password" value="••••••••••••••••" /></div>
+        <div class="form-row"><label>Model</label><select><option>gpt-4o</option><option>gpt-4-turbo</option><option>gpt-4o-mini</option></select></div>
+        <div class="form-row"><label>Temperature</label><input type="number" value="0.7" min="0" max="2" step="0.1" /></div>
+      </div>
+
+      <div class="panel" style="margin:0;">
+        <div class="panel-head"><div class="panel-title"><i data-lucide="shield" style="width:16px;height:16px;"></i> Outbound Guardrails</div></div>
+        <div class="form-row"><label>Daily send limit</label><input type="number" value="20" /></div>
+        <div class="form-row"><label>Min interval between sends (sec)</label><input type="number" value="90" /></div>
+        <div class="form-row"><label>Auto-pause on bounce rate above</label><input type="number" value="3" placeholder="%" /></div>
+      </div>
+    </div>
+    <div style="margin-top:14px;display:flex;justify-content:flex-end;gap:8px;">
+      <button class="btn btn-secondary">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+    </div>
+  `;
+}
+
+function runAudit(id){
+  const p = MOCK_PROSPECTS.find(x => x.id === id);
+  if (!p) return;
+  p.stage = 'Audit Ready';
+  p.signal = 30;
+  p.signalType = 'warming';
+  p.upside = 78 + Math.floor(Math.random() * 10);
+  p.angle = 'Direct Booking Clarity';
+  p.last = 'just now';
+  saveProspects();
+  showToast(`Audit complete for ${p.name}`, 'success');
+  renderAuditWorkspace();
+}
+
+function saveSettings(){
+  const inputs = document.querySelectorAll('.content input, .content select');
+  const data = {};
+  inputs.forEach((el, i) => { if (el.id || el.placeholder) data[el.id || `f${i}`] = el.value; });
+  localStorage.setItem('koaland_outreach_settings', JSON.stringify(data));
+  showToast('Settings saved', 'success');
+}
+
+function refreshAll(){
+  const st = ['st-backend','st-sendgrid','st-openai'];
+  st.forEach((id,i)=>{
+    const d = document.getElementById(id);
+    d.classList.remove('ok'); d.classList.add('warn');
+    setTimeout(()=>{ d.classList.remove('warn'); d.classList.add('ok'); }, 400 + i * 150);
+  });
+  showToast('Synced. All services connected.', 'success');
+}
+</script>
+</body>
+</html>
