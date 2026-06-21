@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "functions": {
+    "api/**/*.ts": {
+      "maxDuration": 60
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/r/([^/]+)/([^/]+)",
+      "dest": "/api/r/[type]/[token].ts"
+    },
+    {
+      "src": "/api/audit/view/([^/]+)",
+      "dest": "/api/audit/view/[token].ts"
+    },
+    {
+      "src": "/api/audit/download/([^/]+)",
+      "dest": "/api/audit/download/[token].ts"
+    },
+    {
+      "src": "/api/prospects/([^/]+)",
+      "dest": "/api/prospects/[id].ts"
+    },
+    {
+      "src": "/api/audits/([^/]+)",
+      "dest": "/api/audits/[id].ts"
+    },
+    {
+      "src": "/api/emails/([^/]+)",
+      "dest": "/api/emails/[id].ts"
+    },
+    {
+      "src": "/api/tasks/([^/]+)",
+      "dest": "/api/tasks/[action].ts"
+    }
+  ]
+}

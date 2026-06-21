@@ -1,0 +1,15 @@
+{
+  "senderName": "Murat",
+  "company": "Koaland.ai",
+  "signature": "Best,\nMurat\nKoaland.ai",
+  "koalandDescription": "Koaland.ai is a commercial decision engine for brand-sensitive hotels.",
+  "demoKitLink": "",
+  "calendarLink": "",
+  "testEmailAddress": "",
+  "dailySendLimit": 10,
+  "followupDelay1Days": 3,
+  "followupDelay2Days": 5,
+  "followupDelay3Days": 8,
+  "unsubscribeFooter": true,
+  "replyToEmail": ""
+}
