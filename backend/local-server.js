@@ -5,7 +5,7 @@
  * API URL: http://localhost:3000  |  Token: value of DASHBOARD_ACCESS_TOKEN in .env (default: local-dev)
  */
 
-require('dotenv').config();
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
