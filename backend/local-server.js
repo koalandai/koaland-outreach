@@ -284,11 +284,54 @@ app.patch('/api/tasks/:id', auth, (req, res) => {
 });
 
 // ─── CAMPAIGNS ───────────────────────────────────────────────────
-app.get('/api/campaigns', auth, (req, res) => res.json({ campaigns: read('campaigns') }));
-app.post('/api/campaigns', auth, (req, res) => {
-  const campaigns = [...read('campaigns'), { ...req.body, id: lid('cmp'), status: req.body.status || 'active', metrics: { prospects:0, sent:0, delivered:0, opened:0, replied:0, bounced:0 }, createdAt: new Date().toISOString() }];
-  write('campaigns', campaigns); res.json({ campaign: campaigns[campaigns.length - 1] });
+const { withCampaignDefaults, planCampaign } = require('./engine/campaign-planner');
+
+app.get('/api/campaigns', auth, (req, res) => {
+  const prospects = read('prospects');
+  const campaigns = read('campaigns').map(c => ({
+    ...c,
+    liveCounts: {
+      prospects: prospects.filter(p => p.campaignId === c.id).length,
+      auditReady: prospects.filter(p => p.campaignId === c.id && ['audit_ready', 'email_drafted', 'sent', 'delivered', 'opened', 'pdf_viewed', 'replied'].includes(p.status)).length,
+      contacted: prospects.filter(p => p.campaignId === c.id && ['sent', 'delivered', 'opened', 'pdf_viewed', 'replied'].includes(p.status)).length,
+      replied: prospects.filter(p => p.campaignId === c.id && p.status === 'replied').length,
+    },
+  }));
+  res.json({ campaigns });
 });
+
+app.post('/api/campaigns/plan', auth, async (req, res) => {
+  try { res.json({ plan: await planCampaign(req.body || {}) }); }
+  catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/campaigns', auth, (req, res) => {
+  const campaign = { ...withCampaignDefaults(req.body), id: lid('cmp'), createdAt: new Date().toISOString() };
+  if (!campaign.name) campaign.name = `${campaign.region || 'New'} campaign`;
+  const campaigns = [...read('campaigns'), campaign];
+  write('campaigns', campaigns); res.status(201).json({ campaign });
+});
+
+app.post('/api/campaigns/:id/activate', auth, (req, res) => {
+  const list = read('campaigns');
+  const idx = list.findIndex(c => c.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  list[idx] = { ...list[idx], status: 'active', activatedAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+  write('campaigns', list);
+  engine.logActivity('info', 'campaign', `Campaign activated: ${list[idx].name}`, list[idx].id);
+  res.json({ campaign: list[idx] });
+});
+
+app.post('/api/campaigns/:id/pause', auth, (req, res) => {
+  const list = read('campaigns');
+  const idx = list.findIndex(c => c.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  list[idx] = { ...list[idx], status: 'paused', updatedAt: new Date().toISOString() };
+  write('campaigns', list);
+  engine.logActivity('info', 'campaign', `Campaign paused: ${list[idx].name}`, list[idx].id);
+  res.json({ campaign: list[idx] });
+});
+
 app.patch('/api/campaigns/:id', auth, (req, res) => {
   const list = read('campaigns');
   const idx = list.findIndex(c => c.id === req.params.id);
