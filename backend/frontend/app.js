@@ -531,6 +531,8 @@ function renderScreen(screen, params = {}) {
     'followup-queue': renderFollowupQueue,
     'analytics': renderAnalytics,
     'settings': renderSettings,
+    'engine': renderEngine,
+    'outbox': renderOutbox,
   };
 
   const fn = screens[screen];
@@ -571,9 +573,9 @@ function relativeTime(iso) {
 }
 
 function scoreColor(score) {
-  if (score >= 75) return 'var(--signal-green)';
-  if (score >= 50) return 'var(--warning)';
-  return 'var(--danger)';
+  if (score >= 75) return 'var(--green)';
+  if (score >= 50) return 'var(--orange)';
+  return 'var(--red)';
 }
 
 function scoreClass(score) {
@@ -635,9 +637,9 @@ function icpTier(score) {
 }
 
 function taskTypeColor(type) {
-  if (type.includes('hot') || type.includes('urgent')) return 'var(--danger)';
+  if (type.includes('hot') || type.includes('urgent')) return 'var(--red)';
   if (type.includes('pdf')) return 'var(--gold)';
-  if (type.includes('open')) return 'var(--signal-green)';
+  if (type.includes('open')) return 'var(--green)';
   return 'var(--dim-text)';
 }
 
@@ -917,7 +919,7 @@ async function runRadarSearch() {
 }
 
 function buildRadarCard(r) {
-  const scoreColor_ = r.initialIcpFit >= 70 ? 'var(--signal-green)' : r.initialIcpFit >= 50 ? 'var(--warning)' : 'var(--dim-text)';
+  const scoreColor_ = r.initialIcpFit >= 70 ? 'var(--green)' : r.initialIcpFit >= 50 ? 'var(--orange)' : 'var(--dim-text)';
   return `
     <div class="radar-card">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
@@ -2313,8 +2315,8 @@ async function loadFollowupQueue() {
       ${tasks.map(t => buildTaskCard(t)).join('')}` : '';
 
     el.innerHTML = `
-      ${section('Overdue', overdue, 'var(--danger)')}
-      ${section('Due Today', today, 'var(--warning)')}
+      ${section('Overdue', overdue, 'var(--red)')}
+      ${section('Due Today', today, 'var(--orange)')}
       ${section('Upcoming', upcoming)}
     `;
   } catch (err) {
@@ -2604,11 +2606,329 @@ function updateStatusDot(id, ok) {
   if (el) { el.className = `status-dot ${ok ? 'ok' : 'err'}`; }
 }
 
+// ─── SCREEN 10: ENGINE CONTROL ROOM ──────────────────────────────
+async function renderEngine(main) {
+  main.innerHTML = `
+    <div class="page-header">
+      <div>
+        <div class="page-label">Autopilot</div>
+        <div class="page-title">Engine Control Room</div>
+        <div class="page-subtitle">Automated acquisition: discovery → research → audit → outreach → follow-ups</div>
+      </div>
+      <div class="flex gap-8">
+        <button class="btn btn-secondary btn-sm" onclick="engineTick()">▶ Run Tick Now</button>
+        <button class="btn btn-primary btn-sm" id="engine-toggle-btn" onclick="toggleEngine()">…</button>
+      </div>
+    </div>
+    <div id="engine-content"><div class="loading-state"><div class="spinner"></div></div></div>
+  `;
+  await loadEngine();
+}
+
+async function loadEngine() {
+  const el = document.getElementById('engine-content');
+  if (!el) return;
+  try {
+    const [status, campData] = await Promise.all([get('/api/engine/status'), get('/api/campaigns')]);
+    state.engineStatus = status;
+    const campaigns = (campData.campaigns || []).filter(c => (c.searchQueries || []).length || c.targetProspectCount);
+
+    const btn = document.getElementById('engine-toggle-btn');
+    if (btn) {
+      btn.textContent = status.running ? '⏸ Stop Engine' : '⚡ Start Engine';
+      btn.className = status.running ? 'btn btn-secondary btn-sm' : 'btn btn-primary btn-sm';
+    }
+    updateEngineBadges(status);
+
+    el.innerHTML = `
+      <div class="grid-5 mb-16">
+        ${metric('Engine', status.running ? '● On' : '○ Off', status.running ? 'green' : 'danger')}
+        ${metric('Tick Interval', `${Math.round((status.intervalMs || 60000) / 1000)}s`)}
+        ${metric('Last Tick', status.lastTickAt ? relativeTime(status.lastTickAt) : '—')}
+        ${metric('Sent Today', status.sentToday ?? 0)}
+        ${metric('Active Campaigns', campaigns.filter(c => c.status === 'active').length, 'gold')}
+      </div>
+
+      <div class="grid-2" style="gap:20px;align-items:start;">
+        <div>
+          <div class="flex" style="justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div class="card-label">Engine Campaigns</div>
+            <button class="btn btn-primary btn-sm" onclick="openEngineCampaignModal()">+ New Campaign</button>
+          </div>
+          ${campaigns.length ? campaigns.map(c => buildEngineCampaignCard(c)).join('') : `<div class="empty-state"><div class="empty-state-icon">◈</div><div class="empty-state-title">No engine campaigns yet</div><div class="empty-state-sub">Create a campaign with a region and let the engine acquire hotels for you.</div></div>`}
+        </div>
+        <div class="card">
+          <div class="card-title">Activity Feed</div>
+          <div style="max-height:520px;overflow-y:auto;">
+            ${(status.log || []).length ? status.log.slice(0, 60).map(l => `
+              <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12.5px;">
+                <span style="color:${l.level === 'error' ? 'var(--red)' : 'var(--dim-text)'};white-space:nowrap;">${relativeTime(l.at)}</span>
+                <span style="color:var(--gold);text-transform:uppercase;font-size:10px;letter-spacing:1px;padding-top:2px;white-space:nowrap;">${l.phase}</span>
+                <span style="color:${l.level === 'error' ? 'var(--red)' : 'var(--muted-text)'};line-height:1.5;">${l.message}</span>
+              </div>`).join('') : `<div class="empty-state-sub" style="padding:16px 0;">No activity yet. Start the engine or run a tick.</div>`}
+          </div>
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-state-sub">${err.message}</div></div>`;
+  }
+}
+
+function buildEngineCampaignCard(c) {
+  const live = c.liveCounts || {};
+  const target = c.targetProspectCount || 15;
+  const pct = Math.min(100, Math.round(((live.prospects || 0) / target) * 100));
+  const statusTag = c.status === 'active' ? '<span class="tag tag-green">Active</span>' : c.status === 'paused' ? '<span class="tag tag-warning">Paused</span>' : `<span class="tag tag-dim">${c.status}</span>`;
+  return `
+    <div class="card" style="margin-bottom:12px;">
+      <div class="flex" style="justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div style="font-weight:600;font-size:15px;">${c.name}</div>
+          <div style="font-size:12px;color:var(--muted-text);margin-top:2px;">${c.region || '—'} · ${c.segment || 'boutique'}</div>
+        </div>
+        ${statusTag}
+      </div>
+      <div style="margin:12px 0;">
+        ${scoreBar(`Prospects ${live.prospects || 0}/${target}`, pct)}
+      </div>
+      <div class="flex gap-8" style="font-size:12px;color:var(--muted-text);margin-bottom:12px;flex-wrap:wrap;">
+        <span>Audited: <strong style="color:var(--text);">${live.auditReady || 0}</strong></span>
+        <span>Contacted: <strong style="color:var(--text);">${live.contacted || 0}</strong></span>
+        <span>Replied: <strong style="color:var(--green);">${live.replied || 0}</strong></span>
+        <span>Daily limit: <strong style="color:var(--text);">${c.sending?.dailySendLimit ?? 10}</strong></span>
+        <span>Window: <strong style="color:var(--text);">${c.sending?.sendWindow?.startHour ?? 9}–${c.sending?.sendWindow?.endHour ?? 18}h</strong></span>
+      </div>
+      <div class="flex gap-8" style="align-items:center;">
+        ${c.status === 'active'
+          ? `<button class="btn btn-secondary btn-sm" onclick="engineCampaignAction('${c.id}','pause')">⏸ Pause</button>`
+          : `<button class="btn btn-primary btn-sm" onclick="engineCampaignAction('${c.id}','activate')">▶ Activate</button>`}
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted-text);cursor:pointer;margin-left:auto;">
+          <input type="checkbox" ${c.sending?.autoSend ? 'checked' : ''} onchange="toggleAutoSend('${c.id}', this.checked)" />
+          Autopilot send ${c.sending?.autoSend ? '<span style="color:var(--orange);">(no approval gate)</span>' : '(approval required)'}
+        </label>
+      </div>
+    </div>`;
+}
+
+async function toggleEngine() {
+  try {
+    const running = state.engineStatus?.running;
+    await post(running ? '/api/engine/stop' : '/api/engine/start', {});
+    toast(running ? 'Engine stopped' : 'Engine started', 'success');
+    loadEngine();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function engineTick() {
+  try {
+    toast('Running tick…', 'info');
+    const r = await post('/api/engine/tick', {});
+    const n = r.summary?.actions?.length || 0;
+    toast(n ? `Tick complete — ${n} action(s)` : 'Tick complete — nothing to do', 'success');
+    loadEngine();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function engineCampaignAction(id, action) {
+  try {
+    await post(`/api/campaigns/${id}/${action}`, {});
+    toast(action === 'activate' ? 'Campaign activated' : 'Campaign paused', 'success');
+    loadEngine();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function toggleAutoSend(id, enabled) {
+  try {
+    const campData = await get('/api/campaigns');
+    const c = (campData.campaigns || []).find(x => x.id === id);
+    if (!c) throw new Error('Campaign not found');
+    await patch(`/api/campaigns/${id}`, { sending: { ...c.sending, autoSend: enabled } });
+    toast(enabled ? 'Autopilot sending ON — emails go out without approval' : 'Approval gate restored', enabled ? 'info' : 'success');
+    loadEngine();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+// ─── ENGINE CAMPAIGN MODAL (with AI planner) ─────────────────────
+function openEngineCampaignModal() {
+  const modal = document.getElementById('modal-overlay');
+  document.getElementById('modal-content').innerHTML = `
+    <div class="modal-title">New Engine Campaign</div>
+    <div style="font-size:12.5px;color:var(--muted-text);margin-bottom:16px;line-height:1.6;">Give the engine a region and a goal. <strong style="color:var(--text);">Plan with AI</strong> fills in search queries, targets, and cadence — review, adjust, then create.</div>
+    <div class="input-row">
+      <div class="form-group"><label class="form-label">Region *</label><input id="ec-region" type="text" placeholder="Bodrum, Turkey" /></div>
+      <div class="form-group"><label class="form-label">Segment</label>
+        <select id="ec-segment"><option>boutique</option><option>luxury</option><option>resort</option><option>independent</option></select>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Goal</label><input id="ec-goal" type="text" placeholder="Book audits with independent boutique hotels" /></div>
+    <div class="flex gap-8" style="margin-bottom:16px;">
+      <button class="btn btn-secondary btn-sm" id="ec-plan-btn" onclick="planEngineCampaign()">✦ Plan with AI</button>
+      <span id="ec-plan-note" style="font-size:11.5px;color:var(--dim-text);align-self:center;"></span>
+    </div>
+    <div class="form-group"><label class="form-label">Campaign Name *</label><input id="ec-name" type="text" placeholder="Bodrum Boutique — Q3" /></div>
+    <div class="form-group"><label class="form-label">Search Queries (one per line)</label><textarea id="ec-queries" rows="3" placeholder="boutique luxury hotels Bodrum official site"></textarea></div>
+    <div class="input-row">
+      <div class="form-group"><label class="form-label">Target Prospects</label><input id="ec-target" type="number" value="15" min="1" max="100" /></div>
+      <div class="form-group"><label class="form-label">Min ICP Fit</label><input id="ec-icp" type="number" value="60" min="0" max="100" /></div>
+      <div class="form-group"><label class="form-label">Daily Send Limit</label><input id="ec-limit" type="number" value="10" min="1" max="50" /></div>
+    </div>
+    <div id="ec-rationale" style="display:none;background:var(--surface-2);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--muted-text);line-height:1.6;margin-bottom:16px;"></div>
+    <div class="flex gap-8">
+      <button class="btn btn-primary" onclick="createEngineCampaign(true)">Create &amp; Activate</button>
+      <button class="btn btn-secondary" onclick="createEngineCampaign(false)">Create as Draft</button>
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>`;
+  modal.classList.add('open');
+}
+
+async function planEngineCampaign() {
+  const region = document.getElementById('ec-region')?.value?.trim();
+  if (!region) { toast('Enter a region first', 'error'); return; }
+  const btn = document.getElementById('ec-plan-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Planning…';
+  try {
+    const r = await post('/api/campaigns/plan', {
+      region,
+      segment: document.getElementById('ec-segment')?.value,
+      goal: document.getElementById('ec-goal')?.value,
+    });
+    const p = r.plan || {};
+    if (p.name) document.getElementById('ec-name').value = p.name;
+    if (p.searchQueries?.length) document.getElementById('ec-queries').value = p.searchQueries.join('\n');
+    if (p.targetProspectCount) document.getElementById('ec-target').value = p.targetProspectCount;
+    if (p.icpThreshold) document.getElementById('ec-icp').value = p.icpThreshold;
+    if (p.sending?.dailySendLimit) document.getElementById('ec-limit').value = p.sending.dailySendLimit;
+    const rat = document.getElementById('ec-rationale');
+    if (p.rationale) { rat.style.display = 'block'; rat.textContent = p.rationale; }
+    document.getElementById('ec-plan-note').textContent = 'Plan loaded — adjust anything before creating.';
+    window._plannedSequence = p.sequence || null;
+  } catch (err) { toast(err.message, 'error'); }
+  finally { btn.disabled = false; btn.textContent = '✦ Plan with AI'; }
+}
+
+async function createEngineCampaign(activate) {
+  const name = document.getElementById('ec-name')?.value?.trim();
+  const region = document.getElementById('ec-region')?.value?.trim();
+  if (!name || !region) { toast('Name and region are required', 'error'); return; }
+  try {
+    const body = {
+      name, region,
+      segment: document.getElementById('ec-segment')?.value,
+      notes: document.getElementById('ec-goal')?.value || '',
+      searchQueries: (document.getElementById('ec-queries')?.value || '').split('\n').map(s => s.trim()).filter(Boolean),
+      targetProspectCount: parseInt(document.getElementById('ec-target')?.value) || 15,
+      icpThreshold: parseInt(document.getElementById('ec-icp')?.value) || 60,
+      sending: { dailySendLimit: parseInt(document.getElementById('ec-limit')?.value) || 10 },
+    };
+    if (window._plannedSequence) body.sequence = window._plannedSequence;
+    const r = await post('/api/campaigns', body);
+    if (activate) await post(`/api/campaigns/${r.campaign.id}/activate`, {});
+    toast(activate ? 'Campaign created and activated — the engine will pick it up on the next tick' : 'Campaign created as draft', 'success');
+    window._plannedSequence = null;
+    closeModal();
+    loadEngine();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+// ─── SCREEN 11: OUTBOX ───────────────────────────────────────────
+async function renderOutbox(main) {
+  main.innerHTML = `
+    <div class="page-header">
+      <div>
+        <div class="page-label">Approval Queue</div>
+        <div class="page-title">Outbox</div>
+        <div class="page-subtitle">Engine-drafted emails wait here until a team member approves them — unless a campaign is on autopilot</div>
+      </div>
+      <div class="flex gap-8">
+        <button class="btn btn-primary btn-sm" onclick="approveAllOutbox()">✓ Approve All Pending</button>
+      </div>
+    </div>
+    <div id="outbox-content"><div class="loading-state"><div class="spinner"></div></div></div>
+  `;
+  await loadOutbox();
+}
+
+async function loadOutbox() {
+  const el = document.getElementById('outbox-content');
+  if (!el) return;
+  try {
+    const data = await get('/api/outbox');
+    const badge = document.getElementById('nav-outbox-badge');
+    if (badge) badge.textContent = (data.pending || []).length || '—';
+
+    const card = (e, pending) => `
+      <div class="card" style="margin-bottom:12px;">
+        <div class="flex" style="justify-content:space-between;align-items:flex-start;gap:12px;">
+          <div style="min-width:0;">
+            <div style="font-weight:600;font-size:14px;">${e.subject}</div>
+            <div style="font-size:12px;color:var(--muted-text);margin-top:3px;">
+              ${e.prospectName} · ${e.to} · step ${e.sequenceStep} (${e.type}) · ${e.campaignName}
+              ${e.variantName ? ` · <span style="color:var(--gold);">${e.variantName}</span>` : ''}
+            </div>
+            ${e.behaviorSignals ? `<div style="font-size:11.5px;color:var(--dim-text);margin-top:3px;">Signals: ${e.behaviorSignals}</div>` : ''}
+          </div>
+          <div class="flex gap-8" style="flex-shrink:0;">
+            ${pending ? `<button class="btn btn-primary btn-sm" onclick="outboxAction('${e.id}','approve')">✓ Approve</button>` : `<span class="tag tag-green">Queued</span>`}
+            <button class="btn btn-secondary btn-sm" onclick="outboxAction('${e.id}','cancel')">✕ Cancel</button>
+          </div>
+        </div>
+        <details style="margin-top:10px;">
+          <summary style="font-size:12px;color:var(--dim-text);cursor:pointer;">Preview email body</summary>
+          <div style="white-space:pre-wrap;font-size:13px;color:var(--muted-text);line-height:1.7;padding:12px 0 4px;">${e.body}</div>
+        </details>
+      </div>`;
+
+    el.innerHTML = `
+      <div class="card-label" style="margin-bottom:10px;color:var(--orange);">Awaiting Approval (${(data.pending || []).length})</div>
+      ${(data.pending || []).length ? data.pending.map(e => card(e, true)).join('') : `<div class="empty-state-sub" style="margin-bottom:20px;">Nothing waiting for approval.</div>`}
+      <div class="card-label" style="margin:20px 0 10px;color:var(--green);">Approved / Auto — sending on next tick (${(data.queued || []).length})</div>
+      ${(data.queued || []).length ? data.queued.map(e => card(e, false)).join('') : `<div class="empty-state-sub">Send queue is empty.</div>`}
+    `;
+  } catch (err) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-state-sub">${err.message}</div></div>`;
+  }
+}
+
+async function outboxAction(id, action) {
+  try {
+    await post(`/api/outbox/${id}/${action}`, {});
+    toast(action === 'approve' ? 'Approved — sends on next engine tick' : 'Cancelled', 'success');
+    loadOutbox();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function approveAllOutbox() {
+  try {
+    const r = await post('/api/outbox/approve-all', {});
+    toast(`${r.approved} email(s) approved — they send on the next tick`, 'success');
+    loadOutbox();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+// ─── ENGINE NAV BADGES ───────────────────────────────────────────
+function updateEngineBadges(status) {
+  const engineBadge = document.getElementById('nav-engine-badge');
+  if (engineBadge) engineBadge.style.display = status?.running ? 'inline-block' : 'none';
+}
+
+async function refreshEngineBadges() {
+  try {
+    const [status, outbox] = await Promise.all([get('/api/engine/status'), get('/api/outbox')]);
+    state.engineStatus = status;
+    updateEngineBadges(status);
+    const badge = document.getElementById('nav-outbox-badge');
+    if (badge) badge.textContent = (outbox.pending || []).length || '—';
+  } catch { /* backend offline — badges stay as-is */ }
+}
+
 // ─── INIT ────────────────────────────────────────────────────────
 async function initApp() {
   await checkBackendStatus();
+  refreshEngineBadges();
   navigate('command-center');
   setInterval(checkBackendStatus, 60000);
+  setInterval(refreshEngineBadges, 30000);
 }
 
 // ─── STARTUP ─────────────────────────────────────────────────────
@@ -2704,3 +3024,13 @@ window._selectedSubject = '';
 window.handleLocalLogin = handleLocalLogin;
 window.exitLocalMode = exitLocalMode;
 window.clearLocalData = clearLocalData;
+window.toggleEngine = toggleEngine;
+window.engineTick = engineTick;
+window.engineCampaignAction = engineCampaignAction;
+window.toggleAutoSend = toggleAutoSend;
+window.openEngineCampaignModal = openEngineCampaignModal;
+window.planEngineCampaign = planEngineCampaign;
+window.createEngineCampaign = createEngineCampaign;
+window.outboxAction = outboxAction;
+window.approveAllOutbox = approveAllOutbox;
+window._plannedSequence = null;
