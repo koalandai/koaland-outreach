@@ -164,44 +164,23 @@ app.get('/api/audits/:id', auth, (req, res) => {
 app.get('/api/audit/view/:token', (req, res) => {
   const audit = read('audits').find(a => a.pdfToken === req.params.token);
   if (!audit) return res.status(404).send('<h1>Audit not found</h1>');
+  recordEvent({ type: 'pdf_opened', auditToken: req.params.token });
   const p = read('prospects').find(x => x.id === audit.prospectId) || { hotelName:'Hotel' };
   const rows = Object.entries(audit.scores||{}).map(([k,v])=>`<tr><td style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);text-transform:capitalize;color:#8B9BB4">${k.replace(/([A-Z])/g,' $1')}</td><td style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-weight:700;color:${v>=70?'#34D399':v>=50?'#FBBF24':'#F87171'}">${v}/100</td></tr>`).join('');
   res.send(`<!DOCTYPE html><html><head><title>${p.hotelName} — Koaland Audit</title><meta charset="UTF-8"><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,-apple-system,sans-serif;background:#070D1A;color:#E8EDF5}header{background:#0F1829;padding:32px 48px;border-bottom:1px solid rgba(255,255,255,0.06)}.brand{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#4F8EF7;margin-bottom:10px}h1{font-size:26px;font-weight:600}main{max-width:760px;margin:48px auto;padding:0 24px}h2{font-size:15px;font-weight:600;color:#8B9BB4;letter-spacing:1px;text-transform:uppercase;margin:32px 0 14px}p{color:#8B9BB4;line-height:1.75;font-size:14px}table{width:100%;border-collapse:collapse;background:#0F1829;border-radius:12px;overflow:hidden;margin-bottom:24px}.angle{background:#162035;border:1px solid rgba(79,142,247,0.2);padding:16px 20px;border-radius:10px;color:#7CB3FF;font-size:14px}</style></head><body><header><div class="brand">Koaland.ai · Digital Experience Audit</div><h1>${p.hotelName}</h1></header><main><h2>Executive Summary</h2><p>${audit.executiveSummary}</p><h2>Scorecard</h2><table><tbody>${rows}</tbody></table><h2>Recommended Angle</h2><div class="angle">${audit.recommendedAngle}</div><h2>Outreach Hook</h2><p>${audit.oneSentenceHook}</p></main></body></html>`);
 });
 
 // ─── EMAIL GENERATION ────────────────────────────────────────────
+const { generateVariants } = require('./engine/email-generator');
+const { recordEvent } = require('./engine/signals');
+
 app.post('/api/emails/generate', auth, async (req, res) => {
-  const { prospectId, type='initial', angle='' } = req.body;
+  const { prospectId, type = 'initial', angle = '' } = req.body;
   const prospect = read('prospects').find(p => p.id === prospectId);
-  if (!prospect) return res.status(404).json({ error:'Not found' });
-  const latestAudit = read('audits').filter(a => a.prospectId === prospectId).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt))[0];
-  const cfg = getSettings();
-
-  if (process.env.OPENAI_API_KEY && latestAudit) {
-    try {
-      console.log('[Email] Calling GPT-4o...');
-      const OpenAI = require('openai');
-      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-      const topFinding = latestAudit.topFindings?.[0];
-      const resp = await openai.chat.completions.create({
-        model:'gpt-4o', temperature:0.5, response_format:{ type:'json_object' },
-        messages:[
-          { role:'system', content:'You write short, premium, founder-led outbound emails for Murat at Koaland.ai. Rules: Never generic. Under 200 words. Always end exactly:\nBest,\nMurat\nKoaland.ai\nNever: "Hope you are well", "I came across", "Just checking in". Specific, calm, commercially useful.' },
-          { role:'user', content:`Generate 3 email variants for ${prospect.hotelName}.\nLocation: ${prospect.location||'Unknown'}\nSegment: ${prospect.segment||'boutique/luxury'}\nType: ${type}, Angle: ${angle||latestAudit.recommendedAngle}\nAudit Summary: ${latestAudit.executiveSummary}\nTop Finding: ${topFinding?.title} — ${topFinding?.outreachHook}\nHook: ${latestAudit.oneSentenceHook}\nScores (no numbers in email): ${Object.entries(latestAudit.scores||{}).map(([k,v])=>`${k}:${v}`).join(', ')}\n${cfg.demoKitLink?`Demo Kit: ${cfg.demoKitLink}`:'No demo kit — omit CTA.'}\n${cfg.calendarLink?`Calendar: ${cfg.calendarLink}`:''}\n\nReturn ONLY valid JSON:\n{"variants":[{"name":"string","angle":"string","subjectOptions":["s1","s2","s3"],"body":"full body with signature","whyThisWorks":"1 sentence","strengthScore":{"personalization":0-100,"clarity":0-100,"commercialHook":0-100,"lengthScore":0-100,"spamRisk":"low|medium|high","ctaStrength":"string"}}]}` }
-        ],
-      });
-      const result = JSON.parse(resp.choices[0].message.content);
-      console.log('[Email] Generated', result.variants?.length, 'variants');
-      return res.json({ variants: result.variants || [] });
-    } catch (err) { console.error('[Email] OpenAI error:', err.message); }
-  }
-
-  const n = prospect.hotelName, loc = prospect.location ? ` in ${prospect.location}` : '';
-  res.json({ variants:[
-    { name:'Direct Booking Hook', angle:'Direct Booking Clarity', subjectOptions:[`Quick note on ${n}'s booking flow`,`${n} — direct booking observation`,`Something I noticed on ${n}'s website`], body:`Hi,\n\nI was looking at ${n}'s website${loc} this week — specifically at how guests move from discovery to a direct booking.\n\nThe property is clearly premium. But the path to a direct reservation has friction points pushing guests toward OTA instead.\n\nI've mapped the specific changes that would have the biggest impact on direct booking conversion.\n\nWould it be useful to share?\n\nBest,\nMurat\nKoaland.ai`, whyThisWorks:'Specific observation, not a pitch. Signals commercial intelligence.', strengthScore:{ personalization:80, clarity:90, commercialHook:84, lengthScore:90, spamRisk:'low', ctaStrength:'soft-ask' } },
-    { name:'AI Search Angle', angle:'AI Search Readiness', subjectOptions:[`What ChatGPT says about ${n}`,`${n} — AI search visibility`,`AI travel and ${n}`], body:`Hi,\n\nI ran ${n} through the AI search assistants luxury travelers now use — ChatGPT, Perplexity, Google AI.\n\nThe property barely surfaces, and when it does, the description doesn't match your actual positioning.\n\nThis is fixable — and worth closing before competitors${loc} get there first.\n\nHappy to share what AI systems see (and don't see).\n\nBest,\nMurat\nKoaland.ai`, whyThisWorks:'Novel angle — very few hotels have heard this framing.', strengthScore:{ personalization:86, clarity:85, commercialHook:90, lengthScore:88, spamRisk:'low', ctaStrength:'curiosity-driven' } },
-    { name:'Quiet Founder Note', angle:'Quiet Founder Note', subjectOptions:[n,'A quick note',`${n} — a quick look`], body:`Hi,\n\nI run a small company helping independent hotels with direct bookings and AI search visibility.\n\n${n} caught my attention. The positioning is right, but the digital presence isn't fully expressing it — meaning some value isn't converting into direct bookings.\n\nNot selling a platform. I do focused, founder-led audits.\n\nIf you're open to a look, I can share what I found.\n\nBest,\nMurat\nKoaland.ai`, whyThisWorks:'"Not selling a platform" disarms immediately. Peer-to-peer framing.', strengthScore:{ personalization:74, clarity:93, commercialHook:70, lengthScore:94, spamRisk:'very-low', ctaStrength:'permission-based' } },
-  ]});
+  if (!prospect) return res.status(404).json({ error: 'Not found' });
+  const latestAudit = read('audits').filter(a => a.prospectId === prospectId).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+  const variants = await generateVariants({ prospect, audit: latestAudit, settings: getSettings(), type, angle });
+  res.json({ variants });
 });
 
 // ─── EMAIL SEND ──────────────────────────────────────────────────
@@ -218,16 +197,87 @@ app.post('/api/emails/send', auth, async (req, res) => {
   } else { console.log(`[Email] No SendGrid. Logged: To:${to} Subject:${subject}`); }
 
   if (!isTest) {
+    const prospect = prospectId ? read('prospects').find(p => p.id === prospectId) : null;
+    const campaign = prospect?.campaignId ? read('campaigns').find(c => c.id === prospect.campaignId) : null;
+    const step = req.body.sequenceStep || (prospect?.sequenceStep || 0) + 1 || 1;
     const emails = read('emails');
-    emails.push({ id:emailId, prospectId: prospectId || null, to, subject, body, type, status:process.env.SENDGRID_API_KEY?'sent':'logged_only', sentAt:new Date().toISOString(), createdAt:new Date().toISOString() });
+    emails.push({ id:emailId, prospectId: prospectId || null, campaignId: prospect?.campaignId || null, sequenceStep: step, to, subject, body, type, status:process.env.SENDGRID_API_KEY?'sent':'logged_only', approvalStatus:'manual', sentAt:new Date().toISOString(), createdAt:new Date().toISOString() });
     write('emails', emails);
-    if (prospectId) {
+    if (prospectId && prospect) {
       const list = read('prospects'); const pIdx = list.findIndex(p=>p.id===prospectId);
-      if (pIdx!==-1) { list[pIdx]={...list[pIdx],status:'sent',hotLeadScore:5,lastActionAt:new Date().toISOString()}; write('prospects',list); }
+      if (pIdx!==-1) {
+        const nextStep = (campaign?.sequence || []).find(s => s.step === step + 1);
+        list[pIdx] = { ...list[pIdx], status:'sent', sequenceStep: step, nextFollowupAt: nextStep ? new Date(Date.now() + nextStep.delayDays * 86400000).toISOString() : list[pIdx].nextFollowupAt || null, lastActionAt:new Date().toISOString() };
+        write('prospects', list);
+      }
       const events = read('events'); events.push({ id:lid('evt'), type:'email_sent', prospectId, emailId, createdAt:new Date().toISOString() }); write('events',events);
+      const { recalcHotLeadScore } = require('./engine/signals');
+      recalcHotLeadScore(prospectId);
+      if (campaign) {
+        const campaigns = read('campaigns');
+        const cIdx = campaigns.findIndex(c => c.id === campaign.id);
+        if (cIdx !== -1) { campaigns[cIdx].metrics = { ...campaigns[cIdx].metrics, sent: (campaigns[cIdx].metrics?.sent || 0) + 1 }; write('campaigns', campaigns); }
+      }
     }
   }
   res.json({ ok:true, emailId, sent:!!process.env.SENDGRID_API_KEY });
+});
+
+// ─── OUTBOX (engine-scheduled emails awaiting approval/send) ─────
+app.get('/api/outbox', auth, (req, res) => {
+  const prospects = read('prospects');
+  const campaigns = read('campaigns');
+  const items = read('emails')
+    .filter(e => e.status === 'scheduled')
+    .map(e => ({
+      ...e,
+      prospectName: prospects.find(p => p.id === e.prospectId)?.hotelName || '—',
+      campaignName: campaigns.find(c => c.id === e.campaignId)?.name || '—',
+    }))
+    .sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt));
+  res.json({
+    pending: items.filter(e => e.approvalStatus === 'pending'),
+    queued: items.filter(e => ['auto', 'approved'].includes(e.approvalStatus)),
+  });
+});
+
+app.post('/api/outbox/approve-all', auth, (req, res) => {
+  const emails = read('emails');
+  let count = 0;
+  for (const e of emails) {
+    if (e.status === 'scheduled' && e.approvalStatus === 'pending') { e.approvalStatus = 'approved'; e.approvedAt = new Date().toISOString(); count++; }
+  }
+  write('emails', emails);
+  engine.logActivity('info', 'outbox', `${count} email(s) approved for sending`);
+  res.json({ ok: true, approved: count });
+});
+
+app.post('/api/outbox/:id/approve', auth, (req, res) => {
+  const emails = read('emails');
+  const idx = emails.findIndex(e => e.id === req.params.id && e.status === 'scheduled');
+  if (idx === -1) return res.status(404).json({ error: 'Scheduled email not found' });
+  emails[idx] = { ...emails[idx], approvalStatus: 'approved', approvedAt: new Date().toISOString() };
+  write('emails', emails);
+  res.json({ email: emails[idx] });
+});
+
+app.post('/api/outbox/:id/cancel', auth, (req, res) => {
+  const emails = read('emails');
+  const idx = emails.findIndex(e => e.id === req.params.id && e.status === 'scheduled');
+  if (idx === -1) return res.status(404).json({ error: 'Scheduled email not found' });
+  emails[idx] = { ...emails[idx], status: 'cancelled', approvalStatus: 'cancelled' };
+  write('emails', emails);
+  res.json({ email: emails[idx] });
+});
+
+// ─── BEHAVIOR SIMULATION (local stand-in for the SendGrid webhook) ─
+app.post('/api/simulate/email/:emailId/:event', auth, (req, res) => {
+  const allowed = ['delivered', 'opened', 'clicked', 'replied', 'bounced', 'unsubscribed'];
+  if (!allowed.includes(req.params.event)) return res.status(400).json({ error: `event must be one of ${allowed.join(', ')}` });
+  const result = recordEvent({ type: req.params.event, emailId: req.params.emailId });
+  if (!result.ok) return res.status(404).json({ error: result.message });
+  engine.logActivity('info', 'signal', `Simulated ${req.params.event}: ${result.message}`);
+  res.json(result);
 });
 
 // ─── TASKS ───────────────────────────────────────────────────────
