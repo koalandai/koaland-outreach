@@ -8,11 +8,11 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const fs = require('fs');
 const path = require('path');
 
-let cheerio; try { cheerio = require('cheerio'); } catch { cheerio = null; }
-let nanoid; try { ({ nanoid } = require('nanoid')); } catch { nanoid = () => Math.random().toString(36).slice(2, 14); }
+const { STORAGE, read, write, lid, getSettings } = require('./engine/store');
+const { crawlWebsite } = require('./engine/crawler');
+const engine = require('./engine/engine');
 
 const app = express();
 app.use(cors({ origin: '*' }));
@@ -20,28 +20,8 @@ app.use(express.json({ limit: '2mb' }));
 
 const PORT = process.env.PORT || 3000;
 const TOKEN = process.env.DASHBOARD_ACCESS_TOKEN || 'local-dev';
-const STORAGE = path.join(__dirname, 'storage');
-
-// ─── FILE STORAGE ────────────────────────────────────────────────
-function read(name) {
-  const file = path.join(STORAGE, `${name}.json`);
-  if (!fs.existsSync(file)) return name === 'settings' ? {} : [];
-  try { return JSON.parse(fs.readFileSync(file, 'utf8') || (name === 'settings' ? '{}' : '[]')); }
-  catch { return name === 'settings' ? {} : []; }
-}
-function write(name, data) {
-  if (!fs.existsSync(STORAGE)) fs.mkdirSync(STORAGE, { recursive: true });
-  fs.writeFileSync(path.join(STORAGE, `${name}.json`), JSON.stringify(data, null, 2));
-}
-function lid(prefix) { return `${prefix}_${nanoid(12)}`; }
-
-const DEFAULT_SETTINGS = {
-  senderName: 'Murat', company: 'Koaland.ai',
-  koalandDescription: 'Commercial intelligence for brand-sensitive hotels',
-  demoKitLink: '', calendarLink: '', testEmailAddress: '',
-  dailySendLimit: 10, followupDelay1Days: 3, followupDelay2Days: 5,
-};
-function getSettings() { return { ...DEFAULT_SETTINGS, ...read('settings') }; }
+const BASE_URL = process.env.TRACKING_BASE_URL || `http://localhost:${PORT}`;
+const ENGINE_CTX = { baseUrl: BASE_URL };
 
 // ─── AUTH ────────────────────────────────────────────────────────
 function auth(req, res, next) {
@@ -371,35 +351,24 @@ app.get('/api/analytics', auth, (req, res) => {
 app.use(express.static(path.join(__dirname, 'frontend')));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'frontend', 'index.html')));
 
-// ─── CRAWLER ────────────────────────────────────────────────────
-async function crawlWebsite(url) {
-  if (!cheerio) throw new Error('cheerio not available');
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), 15000);
-  let html;
-  try {
-    const resp = await fetch(url, { signal:ctrl.signal, headers:{ 'User-Agent':'Mozilla/5.0 (compatible; KoalandBot/1.0)', 'Accept':'text/html', 'Accept-Language':'en-US,en;q=0.9' } });
-    clearTimeout(t);
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    html = await resp.text();
-  } catch (err) { clearTimeout(t); throw err; }
-
-  const $ = cheerio.load(html);
-  $('script,style,noscript,iframe').remove();
-  const title=$('title').first().text().trim();
-  const metaDescription=$('meta[name="description"]').attr('content')?.trim()||'';
-  const headings=[]; $('h1,h2,h3').each((_,el)=>{ const t2=$(el).text().trim(); if(t2) headings.push(t2); });
-  const bodyText=$('body').text().replace(/\s+/g,' ').trim();
-  const ctaTexts=[]; $('a,button,[class*="cta"],[class*="btn"]').each((_,el)=>{ const t2=$(el).text().trim(); if(t2&&t2.length<80) ctaTexts.push(t2); });
-  const bkw=['book','reserve','reservation','booking','rates','availability'];
-  const bookingLinks=[]; $('a[href]').each((_,el)=>{ const h=$(el).attr('href')||'',t2=$(el).text().toLowerCase(); if(bkw.some(k=>t2.includes(k)||h.toLowerCase().includes(k))){ try{bookingLinks.push(h.startsWith('http')?h:new URL(h,url).href);}catch{} } });
-  const emailRegex=/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g;
-  const emailsFound=[...new Set(html.match(emailRegex)||[])].filter(e=>!e.includes('example.com'));
-  const schemaTypes=[]; $('script[type="application/ld+json"]').each((_,el)=>{ try{const d=JSON.parse($(el).html()||'{}');if(d['@type'])schemaTypes.push(d['@type']);}catch{} });
-  return { url, title, metaDescription, headings:[...new Set(headings)].slice(0,50), bodyText:bodyText.slice(0,8000), ctaTexts:[...new Set(ctaTexts)].slice(0,20), bookingLinks:[...new Set(bookingLinks)].slice(0,10), contactLinks:[], emailsFound, faqText:'', schemaTypes:[...new Set(schemaTypes)], robotsHints:'N/A', navLinks:[], hasSitemap:false, crawledAt:new Date().toISOString() };
-}
+// ─── ENGINE ──────────────────────────────────────────────────────
+app.get('/api/engine/status', auth, (req, res) => {
+  const state = engine.getState();
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const sentToday = read('emails').filter(e => !e.isTest && e.sentAt && e.sentAt.slice(0, 10) === todayStr && ['sent', 'logged_only', 'delivered', 'opened', 'clicked', 'replied'].includes(e.status)).length;
+  res.json({ ...state, sentToday });
+});
+app.post('/api/engine/start', auth, (req, res) => res.json({ state: engine.start(ENGINE_CTX) }));
+app.post('/api/engine/stop', auth, (req, res) => res.json({ state: engine.stop() }));
+app.post('/api/engine/tick', auth, async (req, res) => {
+  try { res.json({ summary: await engine.tick(ENGINE_CTX) }); }
+  catch (err) { res.status(500).json({ error: err.message }); }
+});
+app.patch('/api/engine/config', auth, (req, res) => res.json({ state: engine.configure(req.body, ENGINE_CTX) }));
 
 // ─── START ───────────────────────────────────────────────────────
+engine.resumeIfRunning(ENGINE_CTX);
+
 app.listen(PORT, () => {
   console.log('\n' + '═'.repeat(56));
   console.log('  Koaland Prospect Intelligence OS — Local Server');

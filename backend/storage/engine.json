@@ -1,0 +1,23 @@
+{
+  "state": {
+    "running": false,
+    "intervalMs": 60000,
+    "lastTickAt": "2026-07-06T08:51:07.445Z"
+  },
+  "log": [
+    {
+      "at": "2026-07-06T08:51:36.895Z",
+      "level": "info",
+      "phase": "engine",
+      "message": "Engine stopped",
+      "campaignId": null
+    },
+    {
+      "at": "2026-07-06T08:51:07.437Z",
+      "level": "info",
+      "phase": "engine",
+      "message": "Engine started (interval 60s)",
+      "campaignId": null
+    }
+  ]
+}
