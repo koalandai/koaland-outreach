@@ -5,6 +5,46 @@ Research → Audit → Score → Generate PDF → Generate Email → Send → Tr
 
 ---
 
+## Orchestration Engine (local server)
+
+The engine automates the whole acquisition pipeline per campaign:
+**plan campaign → discover prospects in a region → research (crawl) → audit → draft best-variant email → approval Outbox → sequenced sends → scheduled behavior-aware follow-ups**.
+
+Run locally:
+
+```bash
+cd backend
+cp .env.example .env      # add OPENAI_API_KEY for real AI output
+npm install
+node local-server.js      # http://localhost:3000 · token: local-dev
+```
+
+Open the dashboard → **Engine → Control Room** → **+ New Campaign** → enter a region → **Plan with AI** → **Create & Activate** → **Start Engine**. Drafted emails collect in **Engine → Outbox** for one-click approval; flip a campaign's **Autopilot send** to skip the approval gate.
+
+### How it works
+
+- A tick loop (default 60s, `PATCH /api/engine/config`) advances every **active** campaign through phases with small per-tick batch caps: `discovery → research → audit → outreach → followups`, then a global send queue.
+- Phase eligibility comes from persisted prospect/email status — ticks are idempotent and restarts are safe (the loop resumes if it was running).
+- **Safety defaults:** `autoSend:false` (human approval required), per-campaign daily send limit (10) and send window (9–18h), sequences stop permanently on reply/bounce/unsubscribe, and without `SENDGRID_API_KEY` every send is `logged_only` — no real email leaves.
+- Audit-report views are tracked (`pdf_opened` events → hot-lead score, behavior tasks, follow-ups pulled forward). `POST /api/simulate/email/:id/:event` stands in for the SendGrid webhook locally (`delivered|opened|clicked|replied|bounced|unsubscribed`).
+
+### Engine API
+
+```
+GET   /api/engine/status              state + activity log + sent-today
+POST  /api/engine/start | stop | tick
+PATCH /api/engine/config              { intervalMs }
+POST  /api/campaigns/plan             AI campaign proposal from region+goal
+POST  /api/campaigns/:id/activate | pause
+GET   /api/outbox                     pending + queued engine emails
+POST  /api/outbox/:id/approve | cancel · POST /api/outbox/approve-all
+POST  /api/simulate/email/:id/:event  local behavior simulation
+```
+
+Campaign config lives on the campaign record: `region`, `searchQueries[]`, `targetProspectCount`, `icpThreshold`, `sequence[]` (steps + delays in days), `sending{ autoSend, dailySendLimit, sendWindow, testMode }`.
+
+---
+
 ## What this is
 
 A full-stack outbound intelligence cockpit for Murat at Koaland.ai.  
