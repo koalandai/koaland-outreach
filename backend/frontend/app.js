@@ -1,5 +1,5 @@
 // ─── KOALAND PROSPECT INTELLIGENCE OS ──────────────────────────
-// frontend/app.js — Single-page application (no build required)
+// frontend/app.js, Single-page application (no build required)
 
 // ─── CONFIG ─────────────────────────────────────────────────────
 const DEFAULT_API_URL = '';  // Set in Settings or localStorage
@@ -46,13 +46,13 @@ function mockAuditResult(prospect) {
   };
   return {
     scores,
-    executiveSummary: `${prospect.hotelName} presents a compelling luxury brand that is significantly underserved by its digital presence. The property's direct booking capability is undermined by poor CTA hierarchy and absent AI-readable structured data — creating systematic commercial leakage to OTA channels. The commercial upside for a properly positioned digital presence is substantial.`,
+    executiveSummary: `${prospect.hotelName} presents a compelling luxury brand that is significantly underserved by its digital presence. The property's direct booking capability is undermined by poor CTA hierarchy and absent AI-readable structured data, creating systematic commercial leakage to OTA channels. The commercial upside for a properly positioned digital presence is substantial.`,
     recommendedAngle: 'Direct Booking Clarity',
     topFindings: [
-      { title: 'Direct booking CTA buried below the fold', severity: 'high', evidence: 'Primary "Book Now" requires 3+ scrolls on mobile. OTA links appear above the property\'s own reservation engine.', commercialMeaning: 'Guests default to OTA bookings, costing 15–22% commission per reservation.', outreachHook: `Your guests want to book direct — ${prospect.hotelName}'s website just won't let them find the button.` },
-      { title: 'No hotel schema markup', severity: 'high', evidence: 'Missing Hotel, LodgingBusiness, and amenity structured data across all key pages.', commercialMeaning: 'AI assistants cannot accurately represent the property — invisible in AI-assisted booking journeys.', outreachHook: 'ChatGPT and Google AI can\'t recommend you because they literally can\'t read your website.' },
-      { title: 'Mobile experience below luxury standard', severity: 'medium', evidence: 'Mobile PageSpeed in the 40–55 range. Booking flow requires excessive taps on mobile.', commercialMeaning: '60%+ of luxury travelers research on mobile — a slow experience signals brand inconsistency.', outreachHook: 'Half your potential guests decide on their phones. Your mobile experience is losing them at the last step.' },
-      { title: 'No FAQ / experience content for AI queries', severity: 'medium', evidence: 'Sparse content on amenities, dining, and experiences. No FAQ structure.', commercialMeaning: 'AI assistants find nothing to cite when guests ask about the property.', outreachHook: `When someone asks ChatGPT "best boutique hotels in ${prospect.location || 'your area'}" — you're not in the answer.` },
+      { title: 'Direct booking CTA buried below the fold', severity: 'high', evidence: 'Primary "Book Now" requires 3+ scrolls on mobile. OTA links appear above the property\'s own reservation engine.', commercialMeaning: 'Guests default to OTA bookings, costing 15-22% commission per reservation.', outreachHook: `Your guests want to book direct, ${prospect.hotelName}'s website just won't let them find the button.` },
+      { title: 'No hotel schema markup', severity: 'high', evidence: 'Missing Hotel, LodgingBusiness, and amenity structured data across all key pages.', commercialMeaning: 'AI assistants cannot accurately represent the property, invisible in AI-assisted booking journeys.', outreachHook: 'ChatGPT and Google AI can\'t recommend you because they literally can\'t read your website.' },
+      { title: 'Mobile experience below luxury standard', severity: 'medium', evidence: 'Mobile PageSpeed in the 40-55 range. Booking flow requires excessive taps on mobile.', commercialMeaning: '60%+ of luxury travelers research on mobile, a slow experience signals brand inconsistency.', outreachHook: 'Half your potential guests decide on their phones. Your mobile experience is losing them at the last step.' },
+      { title: 'No FAQ / experience content for AI queries', severity: 'medium', evidence: 'Sparse content on amenities, dining, and experiences. No FAQ structure.', commercialMeaning: 'AI assistants find nothing to cite when guests ask about the property.', outreachHook: `When someone asks ChatGPT "best boutique hotels in ${prospect.location || 'your area'}", you're not in the answer.` },
     ],
     commercialLeakageRisks: [
       { title: 'OTA dependency accelerating', severity: 'high', commercialMeaning: 'Commission costs compound annually as the digital gap vs competitors widens.' },
@@ -60,9 +60,9 @@ function mockAuditResult(prospect) {
       { title: 'Competitive disadvantage growing', severity: 'medium', commercialMeaning: 'Regional competitors with stronger digital presence capture AI search and direct bookings.' },
     ],
     opportunities: [
-      { type: 'Quick Win', title: 'Direct booking CTA repositioning', impact: 'High', effort: 'Low', urgency: 'Immediate', whyItMatters: 'A single CTA hierarchy fix can increase direct booking conversion by 20–35% without touching the reservation engine.' },
+      { type: 'Quick Win', title: 'Direct booking CTA repositioning', impact: 'High', effort: 'Low', urgency: 'Immediate', whyItMatters: 'A single CTA hierarchy fix can increase direct booking conversion by 20-35% without touching the reservation engine.' },
       { type: 'Strategic Fix', title: 'Hotel schema implementation', impact: 'High', effort: 'Medium', urgency: '30 days', whyItMatters: 'Structured data unlocks AI search visibility across Google, ChatGPT, and Perplexity.' },
-      { type: 'Commercial Risk', title: 'OTA commission recapture program', impact: 'Very High', effort: 'Medium', urgency: 'This quarter', whyItMatters: 'A 10% shift from OTA to direct on 1,000 annual room nights saves €15,000–€25,000 in commissions.' },
+      { type: 'Commercial Risk', title: 'OTA commission recapture program', impact: 'Very High', effort: 'Medium', urgency: 'This quarter', whyItMatters: 'A 10% shift from OTA to direct on 1,000 annual room nights saves €15,000-€25,000 in commissions.' },
     ],
     pdfUrl: '#local-preview-pdf',
     pdfToken: localId('tok'),
@@ -75,26 +75,26 @@ function mockEmailVariants(prospect) {
   return {
     variants: [
       {
-        name: 'Precision — Direct Booking',
+        name: 'Precision: Direct Booking',
         angle: 'Direct Booking Clarity',
-        subjectOptions: [`Quick note on ${n}'s booking flow`, `Something I noticed on ${n}'s website`, `${n} — direct booking friction`],
-        body: `Hi,\n\nI was looking at ${n}'s website${loc} this week — specifically at how guests move from discovery to booking.\n\nThe property and offering are clearly premium. But the path to a direct reservation has a few friction points that are pushing guests toward OTA instead.\n\nI've put together a short audit with the two or three specific changes that would have the biggest impact on direct booking conversion. No fluff — just findings and what they mean commercially.\n\nWould it be useful to share it with you?\n\nBest,\nMurat\nKoaland.ai`,
+        subjectOptions: [`Quick note on ${n}'s booking flow`, `Something I noticed on ${n}'s website`, `${n}, direct booking friction`],
+        body: `Hi,\n\nI was looking at ${n}'s website${loc} this week, specifically at how guests move from discovery to booking.\n\nThe property and offering are clearly premium. But the path to a direct reservation has a few friction points that are pushing guests toward OTA instead.\n\nI've put together a short audit with the two or three specific changes that would have the biggest impact on direct booking conversion. No fluff, just findings and what they mean commercially.\n\nWould it be useful to share it with you?\n\nBest,\nMurat\nKoaland.ai`,
         whyThisWorks: 'Opens with a specific observation, not a pitch. "Direct reservation" signals commercial awareness without being salesy.',
         strengthScore: { personalization: 82, clarity: 90, commercialHook: 85, lengthScore: 88, spamRisk: 'low', ctaStrength: 'soft-ask' },
       },
       {
-        name: 'AI Angle — Search Visibility',
+        name: 'AI Angle: Search Visibility',
         angle: 'AI Search Readiness',
-        subjectOptions: [`What ChatGPT says about ${n}`, `${n} in AI search — a quick look`, `AI travel discovery and ${n}`],
-        body: `Hi,\n\nI ran ${n} through the AI search assistants that luxury travelers are increasingly using to plan stays — ChatGPT, Perplexity, Google AI Overviews.\n\nThe results were interesting. The property barely surfaces, and when it does, the description doesn't match your actual positioning.\n\nThis is fixable — and it's a gap worth closing before competitors${loc} get there first.\n\nI've documented exactly what the AI systems see (and don't see) about ${n}. Happy to share the findings.\n\nBest,\nMurat\nKoaland.ai`,
-        whyThisWorks: 'The AI search angle is novel and specific — very few hotels have heard this framing. Creates genuine curiosity.',
+        subjectOptions: [`What ChatGPT says about ${n}`, `${n} in AI search, a quick look`, `AI travel discovery and ${n}`],
+        body: `Hi,\n\nI ran ${n} through the AI search assistants that luxury travelers are increasingly using to plan stays, ChatGPT, Perplexity, Google AI Overviews.\n\nThe results were interesting. The property barely surfaces, and when it does, the description doesn't match your actual positioning.\n\nThis is fixable, and it's a gap worth closing before competitors${loc} get there first.\n\nI've documented exactly what the AI systems see (and don't see) about ${n}. Happy to share the findings.\n\nBest,\nMurat\nKoaland.ai`,
+        whyThisWorks: 'The AI search angle is novel and specific, very few hotels have heard this framing. Creates genuine curiosity.',
         strengthScore: { personalization: 88, clarity: 85, commercialHook: 90, lengthScore: 85, spamRisk: 'low', ctaStrength: 'curiosity-driven' },
       },
       {
-        name: 'Quiet Founder — Peer to Peer',
+        name: 'Quiet Founder: Peer to Peer',
         angle: 'Quiet Founder Note',
-        subjectOptions: [n, 'A quick note', `${n} — something worth a look`],
-        body: `Hi,\n\nI run a small company that helps independent hotels strengthen their digital presence — specifically around direct bookings and AI search visibility.\n\n${n} caught my attention. The positioning is right, but the digital presence isn't fully expressing it — which means some of the value you're creating isn't converting into direct bookings.\n\nI'm not selling a platform or a retainer. I do focused, founder-led audits and then specific implementation.\n\nIf you're open to a look, I can share what I found.\n\nBest,\nMurat\nKoaland.ai`,
+        subjectOptions: [n, 'A quick note', `${n}, something worth a look`],
+        body: `Hi,\n\nI run a small company that helps independent hotels strengthen their digital presence, specifically around direct bookings and AI search visibility.\n\n${n} caught my attention. The positioning is right, but the digital presence isn't fully expressing it, which means some of the value you're creating isn't converting into direct bookings.\n\nI'm not selling a platform or a retainer. I do focused, founder-led audits and then specific implementation.\n\nIf you're open to a look, I can share what I found.\n\nBest,\nMurat\nKoaland.ai`,
         whyThisWorks: '"Not selling a platform" disarms immediately. Founder-to-founder framing creates peer-level respect.',
         strengthScore: { personalization: 75, clarity: 92, commercialHook: 72, lengthScore: 92, spamRisk: 'very-low', ctaStrength: 'permission-based' },
       },
@@ -125,7 +125,7 @@ function mockSerpResults(query, location, maxResults) {
       hotelName: h.name,
       website,
       location: loc,
-      snippet: `${h.name} — a curated collection of ${h.rooms} rooms offering personalized luxury in ${loc}. Award-winning design, independent ownership, direct booking available.`,
+      snippet: `${h.name}, a curated collection of ${h.rooms} rooms offering personalized luxury in ${loc}. Award-winning design, independent ownership, direct booking available.`,
       initialIcpFit: Math.round(55 + Math.random() * 40),
       alreadyInDatabase: existingUrls.has(website),
     };
@@ -146,14 +146,14 @@ function seedLocalData() {
   localDB.set('audits', [{
     id: a1, prospectId: p1, status: 'complete', depth: 'full',
     scores: { websiteExperience: 52, seoReadiness: 38, aeoReadiness: 22, geoReadiness: 19, directBookingClarity: 41, luxuryBrandConsistency: 67, commercialUpside: 84, confidence: 78 },
-    executiveSummary: 'Villa Ariadne presents a compelling luxury brand that is significantly underserved by its digital presence. The property\'s direct booking capability is undermined by poor CTA hierarchy and absent AI-readable structured data — creating systematic OTA dependency.',
+    executiveSummary: 'Villa Ariadne presents a compelling luxury brand that is significantly underserved by its digital presence. The property\'s direct booking capability is undermined by poor CTA hierarchy and absent AI-readable structured data, creating systematic OTA dependency.',
     recommendedAngle: 'Direct Booking Clarity',
     topFindings: [
-      { title: 'Booking CTA buried below the fold', severity: 'high', evidence: '"Book Now" only appears after 3 scrolls on mobile. OTA links more prominent.', commercialMeaning: 'OTA path is 5× more visible than direct booking.', outreachHook: 'Your guests want to book direct — the website just won\'t let them find the button.' },
-      { title: 'No hotel schema markup', severity: 'high', evidence: 'Missing Hotel and LodgingBusiness structured data sitewide.', commercialMeaning: 'AI assistants cannot represent the property accurately.', outreachHook: 'ChatGPT literally can\'t recommend you — it can\'t read your site.' },
+      { title: 'Booking CTA buried below the fold', severity: 'high', evidence: '"Book Now" only appears after 3 scrolls on mobile. OTA links more prominent.', commercialMeaning: 'OTA path is 5× more visible than direct booking.', outreachHook: 'Your guests want to book direct, the website just won\'t let them find the button.' },
+      { title: 'No hotel schema markup', severity: 'high', evidence: 'Missing Hotel and LodgingBusiness structured data sitewide.', commercialMeaning: 'AI assistants cannot represent the property accurately.', outreachHook: 'ChatGPT literally can\'t recommend you, it can\'t read your site.' },
     ],
-    commercialLeakageRisks: [{ title: 'OTA dependency', severity: 'high', commercialMeaning: 'Commission costs compound at 15–22% per booking.' }],
-    opportunities: [{ type: 'Quick Win', title: 'CTA repositioning', impact: 'High', effort: 'Low', urgency: 'Immediate', whyItMatters: 'Single change, 25–35% direct booking uplift potential.' }],
+    commercialLeakageRisks: [{ title: 'OTA dependency', severity: 'high', commercialMeaning: 'Commission costs compound at 15-22% per booking.' }],
+    opportunities: [{ type: 'Quick Win', title: 'CTA repositioning', impact: 'High', effort: 'Low', urgency: 'Immediate', whyItMatters: 'Single change, 25-35% direct booking uplift potential.' }],
     pdfUrl: '#local-preview-pdf', pdfToken: localId('tok'), createdAt: now,
   }]);
 
@@ -237,7 +237,7 @@ async function localApi(method, path, body) {
       locationPerformance: [],
       topThemes: [{ theme: 'Direct Booking', count: 4 }, { theme: 'AI Search Visibility', count: 3 }, { theme: 'Commercial Leakage', count: 2 }],
       insights: [
-        'AI Search angle has the highest curiosity rate — leads often ask follow-up questions about what AI systems see.',
+        'AI Search angle has the highest curiosity rate, leads often ask follow-up questions about what AI systems see.',
         'Direct Booking Clarity resonates most with independent properties in competitive tourist markets.',
         'Quiet Founder Note has the highest reply rate when targeting owner-operated boutique hotels.',
       ],
@@ -302,7 +302,7 @@ async function localApi(method, path, body) {
   }
 
   if (path === '/api/emails/send') {
-    if (body.isTest) { toast('[Local] Test email simulated — no email sent', 'info', 4000); return { ok: true }; }
+    if (body.isTest) { toast('[Local] Test email simulated, no email sent', 'info', 4000); return { ok: true }; }
     const emailId = localId('em');
     const rec = { id: emailId, to: body.to, subject: body.subject, body: body.body, type: body.type || 'initial', status: 'sent', sentAt: new Date().toISOString(), createdAt: new Date().toISOString() };
     if (body.prospectId) {
@@ -313,7 +313,7 @@ async function localApi(method, path, body) {
     } else {
       localDB.insert('emails', rec);
     }
-    toast('[Local Mode] Email logged — no actual email sent', 'info', 4000);
+    toast('[Local Mode] Email logged, no actual email sent', 'info', 4000);
     return { ok: true, emailId };
   }
 
@@ -555,13 +555,13 @@ function setLoading(key, val) {
 }
 
 function formatDate(iso) {
-  if (!iso) return '—';
+  if (!iso) return ',';
   const d = new Date(iso);
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 function relativeTime(iso) {
-  if (!iso) return '—';
+  if (!iso) return ',';
   const diff = Date.now() - new Date(iso).getTime();
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return 'just now';
@@ -633,7 +633,7 @@ function icpTier(score) {
   if (score >= 80) return '<span class="icp-tier icp-A">A</span>';
   if (score >= 60) return '<span class="icp-tier icp-B">B</span>';
   if (score >= 40) return '<span class="icp-tier icp-C">C</span>';
-  return '<span class="icp-tier icp-X">—</span>';
+  return '<span class="icp-tier icp-X">,</span>';
 }
 
 function taskTypeColor(type) {
@@ -644,7 +644,7 @@ function taskTypeColor(type) {
 }
 
 function dueLabel(dueAt) {
-  if (!dueAt) return '<span class="task-due upcoming">—</span>';
+  if (!dueAt) return '<span class="task-due upcoming">,</span>';
   const diff = new Date(dueAt).getTime() - Date.now();
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
   if (days < 0) return `<span class="task-due overdue">Overdue ${Math.abs(days)}d</span>`;
@@ -1048,11 +1048,11 @@ function buildProspectRow(p) {
     <tr onclick="openProspectDetail('${p.id}')" style="cursor:pointer;">
       <td>
         <div class="td-hotel">${p.hotelName}</div>
-        <div class="text-dim" style="font-size:11px;">${p.website ? `<a href="${p.website}" target="_blank" onclick="event.stopPropagation()">${p.website.replace('https://','').replace('www.','').slice(0,30)}</a>` : '—'}</div>
+        <div class="text-dim" style="font-size:11px;">${p.website ? `<a href="${p.website}" target="_blank" onclick="event.stopPropagation()">${p.website.replace('https://','').replace('www.','').slice(0,30)}</a>` : ','}</div>
       </td>
-      <td>${p.location || '—'}</td>
+      <td>${p.location || ','}</td>
       <td>${icpTier(p.icpFitScore || 0)}</td>
-      <td>${p.commercialUpsideScore ? `<span style="color:${scoreColor(p.commercialUpsideScore)}">${p.commercialUpsideScore}</span>` : '—'}</td>
+      <td>${p.commercialUpsideScore ? `<span style="color:${scoreColor(p.commercialUpsideScore)}">${p.commercialUpsideScore}</span>` : ','}</td>
       <td>${signalPill(p.hotLeadScore || 0)}</td>
       <td>${statusBadge(p.status)}</td>
       <td>${relativeTime(p.lastActionAt)}</td>
@@ -1099,13 +1099,13 @@ async function openProspectDetail(id) {
         ${icpTier(p.icpFitScore || 0)}
       </div>
 
-      <div class="detail-field"><div class="detail-field-label">Website</div><div class="detail-field-value">${p.website ? `<a href="${p.website}" target="_blank">${p.website} ↗</a>` : '—'}</div></div>
-      <div class="detail-field"><div class="detail-field-label">Location</div><div class="detail-field-value">${p.location || '—'}</div></div>
-      <div class="detail-field"><div class="detail-field-label">Segment</div><div class="detail-field-value">${p.segment || '—'}</div></div>
-      <div class="detail-field"><div class="detail-field-label">Contact Email</div><div class="detail-field-value">${p.contactEmail || '—'}</div></div>
-      <div class="detail-field"><div class="detail-field-label">Contact Person</div><div class="detail-field-value">${p.contactPerson || '—'}</div></div>
-      <div class="detail-field"><div class="detail-field-label">Recommended Angle</div><div class="detail-field-value text-gold">${p.recommendedAngle || '—'}</div></div>
-      <div class="detail-field"><div class="detail-field-label">Notes</div><div class="detail-field-value">${p.notes || '—'}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Website</div><div class="detail-field-value">${p.website ? `<a href="${p.website}" target="_blank">${p.website} ↗</a>` : ','}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Location</div><div class="detail-field-value">${p.location || ','}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Segment</div><div class="detail-field-value">${p.segment || ','}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Contact Email</div><div class="detail-field-value">${p.contactEmail || ','}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Contact Person</div><div class="detail-field-value">${p.contactPerson || ','}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Recommended Angle</div><div class="detail-field-value text-gold">${p.recommendedAngle || ','}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Notes</div><div class="detail-field-value">${p.notes || ','}</div></div>
 
       ${latestAudit ? `
         <div class="separator"></div>
@@ -1270,7 +1270,7 @@ async function renderAuditWorkspace(main, params = {}) {
           <label class="form-label">Prospect</label>
           <select id="audit-prospect-id">
             <option value="">Select prospect...</option>
-            ${prospects.map(p => `<option value="${p.id}" ${params.prospectId === p.id ? 'selected' : ''}>${p.hotelName} — ${p.location || p.website || ''}</option>`).join('')}
+            ${prospects.map(p => `<option value="${p.id}" ${params.prospectId === p.id ? 'selected' : ''}>${p.hotelName}, ${p.location || p.website || ''}</option>`).join('')}
           </select>
         </div>
         <div class="form-group">
@@ -1311,7 +1311,7 @@ async function runAudit() {
   const competitorUrls = competitorRaw.split(',').map(u => u.trim()).filter(Boolean);
 
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Running audit — this takes 30–60 seconds...';
+  btn.innerHTML = '<span class="spinner"></span> Running audit, this takes 30-60 seconds...';
   resultEl.innerHTML = `
     <div class="loading-state">
       <div class="spinner"></div>
@@ -1363,7 +1363,7 @@ function buildAuditResult(data) {
             </div>
             <div class="flex-1">
               <div class="text-dim" style="font-size:12px;margin-bottom:6px;">Recommended angle:</div>
-              <div style="font-size:13px;color:var(--gold);">${data.recommendedAngle || '—'}</div>
+              <div style="font-size:13px;color:var(--gold);">${data.recommendedAngle || ','}</div>
             </div>
           </div>
         </div>
@@ -1464,9 +1464,9 @@ async function renderEmailStudio(main, params = {}) {
           <label class="form-label">Email Type</label>
           <select id="email-type">
             <option value="initial">Initial Outreach</option>
-            <option value="followup_1">Follow-up 1 — Gentle</option>
-            <option value="followup_2">Follow-up 2 — Specific Finding</option>
-            <option value="followup_3">Follow-up 3 — Close the Loop</option>
+            <option value="followup_1">Follow-up 1, Gentle</option>
+            <option value="followup_2">Follow-up 2, Specific Finding</option>
+            <option value="followup_3">Follow-up 3, Close the Loop</option>
             <option value="pdf_opened">PDF Opened Follow-up</option>
           </select>
         </div>
@@ -1526,7 +1526,7 @@ async function loadEmailContext() {
 
     contextEl.innerHTML = `
       <div class="detail-field"><div class="detail-field-label">Hotel</div><div class="detail-field-value">${p.hotelName}</div></div>
-      <div class="detail-field"><div class="detail-field-label">Location</div><div class="detail-field-value">${p.location || '—'}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Location</div><div class="detail-field-value">${p.location || ','}</div></div>
       <div class="detail-field"><div class="detail-field-label">To Email</div><div class="detail-field-value">${p.contactEmail || '<span class="text-dim">Not set</span>'}</div></div>
       <div class="detail-field"><div class="detail-field-label">Status</div><div class="detail-field-value">${statusBadge(p.status)}</div></div>
       ${latestAudit ? `
@@ -1536,7 +1536,7 @@ async function loadEmailContext() {
         <div style="margin-top:10px;"><a href="${latestAudit.pdfUrl}" target="_blank" class="btn btn-gold btn-xs">View Audit ↗</a></div>
         <div class="separator"></div>
         <div class="detail-field-label" style="margin-bottom:6px;">Recommended Angle</div>
-        <div style="font-size:12px;color:var(--gold);">${latestAudit.recommendedAngle || '—'}</div>
+        <div style="font-size:12px;color:var(--gold);">${latestAudit.recommendedAngle || ','}</div>
       ` : `<div class="separator"></div><div class="text-dim" style="font-size:12px;">No audit yet. <a href="#" onclick="openAuditFor('${p.id}')">Run audit first</a></div>`}
     `;
   } catch (err) {
@@ -1624,8 +1624,8 @@ function renderEmailVariants(variants, selectedIdx) {
     <div class="strength-row"><span class="strength-label">Clarity</span><span class="strength-val" style="color:${scoreColor(ss.clarity||0)}">${ss.clarity || 0}/100</span></div>
     <div class="strength-row"><span class="strength-label">Commercial Hook</span><span class="strength-val" style="color:${scoreColor(ss.commercialHook||0)}">${ss.commercialHook || 0}/100</span></div>
     <div class="strength-row"><span class="strength-label">Length</span><span class="strength-val">${ss.lengthScore || 0}/100</span></div>
-    <div class="strength-row"><span class="strength-label">Spam Risk</span><span class="strength-val ${ss.spamRisk === 'low' ? 'text-green' : ss.spamRisk === 'high' ? 'text-danger' : ''}">${ss.spamRisk || '—'}</span></div>
-    <div class="strength-row"><span class="strength-label">CTA Strength</span><span class="strength-val">${ss.ctaStrength || '—'}</span></div>
+    <div class="strength-row"><span class="strength-label">Spam Risk</span><span class="strength-val ${ss.spamRisk === 'low' ? 'text-green' : ss.spamRisk === 'high' ? 'text-danger' : ''}">${ss.spamRisk || ','}</span></div>
+    <div class="strength-row"><span class="strength-label">CTA Strength</span><span class="strength-val">${ss.ctaStrength || ','}</span></div>
   `;
 }
 
@@ -1665,7 +1665,7 @@ async function sendEmailNow() {
 async function sendTestEmail() {
   const prospectId = document.getElementById('email-prospect-id')?.value;
   const body = document.getElementById('email-body-text')?.value;
-  const subject = window._selectedSubject || 'Test — Digital experience snapshot';
+  const subject = window._selectedSubject || 'Test, Digital experience snapshot';
 
   if (!prospectId || !body) { toast('Select prospect and ensure body is not empty', 'error'); return; }
 
@@ -1697,7 +1697,7 @@ async function renderCampaigns(main) {
       <div>
         <div class="page-label">Outbound Operations</div>
         <div class="page-title">Campaigns & Mailing</div>
-        <div class="page-subtitle">Group contacts by market and angle — compose, send, and track personalised outbound sequences</div>
+        <div class="page-subtitle">Group contacts by market and angle, compose, send, and track personalised outbound sequences</div>
       </div>
       <div class="flex gap-8" id="camp-header-actions">
         <button class="btn btn-primary btn-sm" onclick="openCreateCampaignModal()">+ New Campaign</button>
@@ -1740,7 +1740,7 @@ async function renderCampaignsList(container) {
       <div class="explainer-icon">◉</div>
       <div>
         <div class="explainer-title">What is a Campaign?</div>
-        <div class="explainer-body">A campaign is a focused mailing group — add contacts by market and angle, then send personalised emails to each one. Track who's been contacted, opened, and replied all in one place. Use <strong style="color:var(--text)">Mailing Contacts</strong> tab to add recipients directly without running a full audit.</div>
+        <div class="explainer-body">A campaign is a focused mailing group, add contacts by market and angle, then send personalised emails to each one. Track who's been contacted, opened, and replied all in one place. Use <strong style="color:var(--text)">Mailing Contacts</strong> tab to add recipients directly without running a full audit.</div>
       </div>
     </div>
     <div id="campaigns-list-inner"><div class="loading-state"><div class="spinner"></div></div></div>
@@ -1824,7 +1824,7 @@ function buildCampaignCardV2(c, contacts) {
 function buildCampaignContactRows(campaignId, contacts) {
   if (!contacts.length) return `
     <div style="padding:20px 0;text-align:center;color:var(--dim-text);font-size:13px;">
-      No contacts yet —
+      No contacts yet,
       <button class="btn btn-secondary btn-xs" style="margin-left:6px;" onclick="openAddContactModal('${campaignId}')">Add first contact</button>
       <span style="margin:0 6px;">or</span>
       <button class="btn btn-secondary btn-xs" onclick="switchCampaignTab('contacts')">Go to Mailing Contacts</button>
@@ -1832,10 +1832,10 @@ function buildCampaignContactRows(campaignId, contacts) {
 
   const rows = contacts.map(ct => `
     <tr>
-      <td><div style="font-weight:500;color:var(--text);">${ct.hotelName || '—'}</div>${ct.location ? `<div style="font-size:11px;color:var(--dim-text);">${ct.location}</div>` : ''}</td>
-      <td>${ct.contactName || '—'}</td>
-      <td><span style="color:var(--muted-text);font-size:12px;">${ct.email || '—'}</span></td>
-      <td>${ct.role || '—'}</td>
+      <td><div style="font-weight:500;color:var(--text);">${ct.hotelName || ','}</div>${ct.location ? `<div style="font-size:11px;color:var(--dim-text);">${ct.location}</div>` : ''}</td>
+      <td>${ct.contactName || ','}</td>
+      <td><span style="color:var(--muted-text);font-size:12px;">${ct.email || ','}</span></td>
+      <td>${ct.role || ','}</td>
       <td><span class="contact-status ${ct.status||'not_sent'}">${formatContactStatus(ct.status)}</span></td>
       <td onclick="event.stopPropagation()">
         <div class="flex gap-6">
@@ -1887,15 +1887,15 @@ function openCreateCampaignModal() {
   const modal = document.getElementById('modal-overlay');
   document.getElementById('modal-content').innerHTML = `
     <div class="modal-title">New Campaign</div>
-    <div style="font-size:12.5px;color:var(--muted-text);margin-bottom:20px;line-height:1.6;">A campaign groups mailing contacts by market and angle. Create it first, then add contacts — or add contacts directly from the Mailing Contacts tab.</div>
-    <div class="form-group"><label class="form-label">Campaign Name *</label><input id="camp-name" type="text" placeholder="Bodrum Luxury — Q3" /></div>
+    <div style="font-size:12.5px;color:var(--muted-text);margin-bottom:20px;line-height:1.6;">A campaign groups mailing contacts by market and angle. Create it first, then add contacts, or add contacts directly from the Mailing Contacts tab.</div>
+    <div class="form-group"><label class="form-label">Campaign Name *</label><input id="camp-name" type="text" placeholder="Bodrum Luxury, Q3" /></div>
     <div class="input-row">
       <div class="form-group"><label class="form-label">Market / Region</label><input id="camp-market" type="text" placeholder="Bodrum, Turkey" /></div>
       <div class="form-group"><label class="form-label">Hotel Segment</label><input id="camp-segment" type="text" placeholder="Boutique / Luxury" /></div>
     </div>
     <div class="form-group"><label class="form-label">Default Outreach Angle</label>
       <select id="camp-angle">
-        <option value="">Auto — let Email Studio decide</option>
+        <option value="">Auto, let Email Studio decide</option>
         <option>Direct Booking Clarity</option>
         <option>AI Search Readiness</option>
         <option>Commercial Leakage</option>
@@ -1937,7 +1937,7 @@ async function openAddContactModal(campaignId) {
   const camps = campData.campaigns || [];
   document.getElementById('modal-content').innerHTML = `
     <div class="modal-title">Add Mailing Contact</div>
-    <div style="font-size:12.5px;color:var(--muted-text);margin-bottom:20px;line-height:1.6;">Add a hotel contact for direct email outreach — no audit or prospect workflow required. Click <strong style="color:var(--text);">Send Email</strong> after adding to compose and send.</div>
+    <div style="font-size:12.5px;color:var(--muted-text);margin-bottom:20px;line-height:1.6;">Add a hotel contact for direct email outreach, no audit or prospect workflow required. Click <strong style="color:var(--text);">Send Email</strong> after adding to compose and send.</div>
     <div class="input-row">
       <div class="form-group"><label class="form-label">Hotel Name *</label><input id="c-hotel" type="text" placeholder="Villa Bodrum" /></div>
       <div class="form-group"><label class="form-label">Contact Name</label><input id="c-name" type="text" placeholder="Ali Kaya" /></div>
@@ -1946,7 +1946,7 @@ async function openAddContactModal(campaignId) {
       <div class="form-group"><label class="form-label">Email Address *</label><input id="c-email" type="email" placeholder="ali@villabodrum.com" /></div>
       <div class="form-group"><label class="form-label">Role</label>
         <select id="c-role">
-          <option value="">— Select role —</option>
+          <option value="">, Select role,</option>
           <option>Owner</option><option>General Manager</option><option>Marketing Manager</option>
           <option>Revenue Manager</option><option>Director</option><option>Other</option>
         </select>
@@ -2016,7 +2016,7 @@ async function openContactComposeModal(contactId) {
     window._currentContactId = contactId;
 
     document.getElementById('modal-content').innerHTML = `
-      <div class="modal-title">Compose — ${contact.contactName || contact.hotelName}</div>
+      <div class="modal-title">Compose, ${contact.contactName || contact.hotelName}</div>
       <div style="font-size:12px;color:var(--dim-text);margin-bottom:16px;display:flex;align-items:center;gap:8px;">
         <span>📧 ${contact.email}</span>
         ${contact.role ? `<span class="tag tag-dim">${contact.role}</span>` : ''}
@@ -2114,7 +2114,7 @@ async function renderMailingContacts(container) {
       <div class="explainer-icon">✉</div>
       <div>
         <div class="explainer-title" style="color:var(--green);">Direct Mailing Contacts</div>
-        <div class="explainer-body">Add hotel contacts here for direct email outreach — no audit or full prospect workflow needed. Enter a hotel name, email, and role. Assign to a campaign to organise your sends. Click <strong style="color:var(--text);">Send Email</strong> on any row to compose and send immediately.</div>
+        <div class="explainer-body">Add hotel contacts here for direct email outreach, no audit or full prospect workflow needed. Enter a hotel name, email, and role. Assign to a campaign to organise your sends. Click <strong style="color:var(--text);">Send Email</strong> on any row to compose and send immediately.</div>
       </div>
     </div>
     <div class="card" style="padding:12px 18px;margin-bottom:14px;">
@@ -2166,7 +2166,7 @@ async function loadContacts() {
         <div class="empty-state">
           <div class="empty-state-icon">✉</div>
           <div class="empty-state-title">No contacts yet</div>
-          <div class="empty-state-sub">Add contacts for direct mailing. No audit or research needed — just add and send.</div>
+          <div class="empty-state-sub">Add contacts for direct mailing. No audit or research needed, just add and send.</div>
           <button class="btn btn-primary btn-sm" style="margin-top:16px;" onclick="openAddContactModal('')">+ Add First Contact</button>
         </div>`;
       return;
@@ -2182,13 +2182,13 @@ async function loadContacts() {
             ${contacts.map(c => `
               <tr>
                 <td>
-                  <div style="font-weight:500;color:var(--text);">${c.hotelName || '—'}</div>
+                  <div style="font-weight:500;color:var(--text);">${c.hotelName || ','}</div>
                   ${c.location ? `<div style="font-size:11px;color:var(--dim-text);">${c.location}</div>` : ''}
                 </td>
-                <td>${c.contactName || '—'}</td>
-                <td><span style="color:var(--muted-text);font-size:12px;">${c.email || '—'}</span></td>
-                <td>${c.role || '—'}</td>
-                <td>${c.campaignId && campMap[c.campaignId] ? `<span class="tag tag-blue" style="font-size:11px;">${campMap[c.campaignId]}</span>` : '<span class="text-dim">—</span>'}</td>
+                <td>${c.contactName || ','}</td>
+                <td><span style="color:var(--muted-text);font-size:12px;">${c.email || ','}</span></td>
+                <td>${c.role || ','}</td>
+                <td>${c.campaignId && campMap[c.campaignId] ? `<span class="tag tag-blue" style="font-size:11px;">${campMap[c.campaignId]}</span>` : '<span class="text-dim">,</span>'}</td>
                 <td><span class="contact-status ${c.status || 'not_sent'}">${formatContactStatus(c.status)}</span></td>
                 <td>
                   <div class="flex gap-6">
@@ -2226,7 +2226,7 @@ async function openEditContactModal(contactId) {
         <div class="form-group"><label class="form-label">Email</label><input id="ec-email" type="email" value="${contact.email || ''}" /></div>
         <div class="form-group"><label class="form-label">Role</label>
           <select id="ec-role">
-            <option value="">—</option>
+            <option value="">,</option>
             ${['Owner','General Manager','Marketing Manager','Revenue Manager','Director','Other'].map(r => `<option ${contact.role === r ? 'selected' : ''}>${r}</option>`).join('')}
           </select>
         </div>
@@ -2460,7 +2460,7 @@ function buildSettings(s) {
   const localBanner = LOCAL_MODE ? `
     <div class="settings-section" style="border-color:rgba(185,154,97,0.3);background:rgba(185,154,97,0.05);">
       <div class="settings-section-title" style="color:var(--gold);">Local Preview Mode Active</div>
-      <div style="font-size:13px;color:var(--muted-ivory);margin-bottom:14px;line-height:1.6;">Data is stored in your browser (localStorage). No emails are actually sent — Send is simulated locally. Connect Vercel to enable real AI audits, email delivery, and tracking.</div>
+      <div style="font-size:13px;color:var(--muted-ivory);margin-bottom:14px;line-height:1.6;">Data is stored in your browser (localStorage). No emails are actually sent, Send is simulated locally. Connect Vercel to enable real AI audits, email delivery, and tracking.</div>
       <div class="flex gap-8" style="flex-wrap:wrap;">
         <button class="btn btn-secondary btn-sm" onclick="exitLocalMode()">Switch to Vercel Backend</button>
         <button class="btn btn-secondary btn-sm" onclick="clearLocalData()">Clear All Local Data</button>
@@ -2644,7 +2644,7 @@ async function loadEngine() {
       <div class="grid-5 mb-16">
         ${metric('Engine', status.running ? '● On' : '○ Off', status.running ? 'green' : 'danger')}
         ${metric('Tick Interval', `${Math.round((status.intervalMs || 60000) / 1000)}s`)}
-        ${metric('Last Tick', status.lastTickAt ? relativeTime(status.lastTickAt) : '—')}
+        ${metric('Last Tick', status.lastTickAt ? relativeTime(status.lastTickAt) : ',')}
         ${metric('Sent Today', status.sentToday ?? 0)}
         ${metric('Active Campaigns', campaigns.filter(c => c.status === 'active').length, 'gold')}
       </div>
@@ -2685,7 +2685,7 @@ function buildEngineCampaignCard(c) {
       <div class="flex" style="justify-content:space-between;align-items:flex-start;">
         <div>
           <div style="font-weight:600;font-size:15px;">${c.name}</div>
-          <div style="font-size:12px;color:var(--muted-text);margin-top:2px;">${c.region || '—'} · ${c.segment || 'boutique'}</div>
+          <div style="font-size:12px;color:var(--muted-text);margin-top:2px;">${c.region || ','} · ${c.segment || 'boutique'}</div>
         </div>
         ${statusTag}
       </div>
@@ -2697,7 +2697,7 @@ function buildEngineCampaignCard(c) {
         <span>Contacted: <strong style="color:var(--text);">${live.contacted || 0}</strong></span>
         <span>Replied: <strong style="color:var(--green);">${live.replied || 0}</strong></span>
         <span>Daily limit: <strong style="color:var(--text);">${c.sending?.dailySendLimit ?? 10}</strong></span>
-        <span>Window: <strong style="color:var(--text);">${c.sending?.sendWindow?.startHour ?? 9}–${c.sending?.sendWindow?.endHour ?? 18}h</strong></span>
+        <span>Window: <strong style="color:var(--text);">${c.sending?.sendWindow?.startHour ?? 9}-${c.sending?.sendWindow?.endHour ?? 18}h</strong></span>
       </div>
       <div class="flex gap-8" style="align-items:center;">
         ${c.status === 'active'
@@ -2725,7 +2725,7 @@ async function engineTick() {
     toast('Running tick…', 'info');
     const r = await post('/api/engine/tick', {});
     const n = r.summary?.actions?.length || 0;
-    toast(n ? `Tick complete — ${n} action(s)` : 'Tick complete — nothing to do', 'success');
+    toast(n ? `Tick complete, ${n} action(s)` : 'Tick complete, nothing to do', 'success');
     loadEngine();
   } catch (err) { toast(err.message, 'error'); }
 }
@@ -2744,7 +2744,7 @@ async function toggleAutoSend(id, enabled) {
     const c = (campData.campaigns || []).find(x => x.id === id);
     if (!c) throw new Error('Campaign not found');
     await patch(`/api/campaigns/${id}`, { sending: { ...c.sending, autoSend: enabled } });
-    toast(enabled ? 'Autopilot sending ON — emails go out without approval' : 'Approval gate restored', enabled ? 'info' : 'success');
+    toast(enabled ? 'Autopilot sending ON, emails go out without approval' : 'Approval gate restored', enabled ? 'info' : 'success');
     loadEngine();
   } catch (err) { toast(err.message, 'error'); }
 }
@@ -2754,7 +2754,7 @@ function openEngineCampaignModal() {
   const modal = document.getElementById('modal-overlay');
   document.getElementById('modal-content').innerHTML = `
     <div class="modal-title">New Engine Campaign</div>
-    <div style="font-size:12.5px;color:var(--muted-text);margin-bottom:16px;line-height:1.6;">Give the engine a region and a goal. <strong style="color:var(--text);">Plan with AI</strong> fills in search queries, targets, and cadence — review, adjust, then create.</div>
+    <div style="font-size:12.5px;color:var(--muted-text);margin-bottom:16px;line-height:1.6;">Give the engine a region and a goal. <strong style="color:var(--text);">Plan with AI</strong> fills in search queries, targets, and cadence, review, adjust, then create.</div>
     <div class="input-row">
       <div class="form-group"><label class="form-label">Region *</label><input id="ec-region" type="text" placeholder="Bodrum, Turkey" /></div>
       <div class="form-group"><label class="form-label">Segment</label>
@@ -2766,7 +2766,7 @@ function openEngineCampaignModal() {
       <button class="btn btn-secondary btn-sm" id="ec-plan-btn" onclick="planEngineCampaign()">✦ Plan with AI</button>
       <span id="ec-plan-note" style="font-size:11.5px;color:var(--dim-text);align-self:center;"></span>
     </div>
-    <div class="form-group"><label class="form-label">Campaign Name *</label><input id="ec-name" type="text" placeholder="Bodrum Boutique — Q3" /></div>
+    <div class="form-group"><label class="form-label">Campaign Name *</label><input id="ec-name" type="text" placeholder="Bodrum Boutique, Q3" /></div>
     <div class="form-group"><label class="form-label">Search Queries (one per line)</label><textarea id="ec-queries" rows="3" placeholder="boutique luxury hotels Bodrum official site"></textarea></div>
     <div class="input-row">
       <div class="form-group"><label class="form-label">Target Prospects</label><input id="ec-target" type="number" value="15" min="1" max="100" /></div>
@@ -2801,7 +2801,7 @@ async function planEngineCampaign() {
     if (p.sending?.dailySendLimit) document.getElementById('ec-limit').value = p.sending.dailySendLimit;
     const rat = document.getElementById('ec-rationale');
     if (p.rationale) { rat.style.display = 'block'; rat.textContent = p.rationale; }
-    document.getElementById('ec-plan-note').textContent = 'Plan loaded — adjust anything before creating.';
+    document.getElementById('ec-plan-note').textContent = 'Plan loaded, adjust anything before creating.';
     window._plannedSequence = p.sequence || null;
   } catch (err) { toast(err.message, 'error'); }
   finally { btn.disabled = false; btn.textContent = '✦ Plan with AI'; }
@@ -2824,7 +2824,7 @@ async function createEngineCampaign(activate) {
     if (window._plannedSequence) body.sequence = window._plannedSequence;
     const r = await post('/api/campaigns', body);
     if (activate) await post(`/api/campaigns/${r.campaign.id}/activate`, {});
-    toast(activate ? 'Campaign created and activated — the engine will pick it up on the next tick' : 'Campaign created as draft', 'success');
+    toast(activate ? 'Campaign created and activated, the engine will pick it up on the next tick' : 'Campaign created as draft', 'success');
     window._plannedSequence = null;
     closeModal();
     loadEngine();
@@ -2838,7 +2838,7 @@ async function renderOutbox(main) {
       <div>
         <div class="page-label">Approval Queue</div>
         <div class="page-title">Outbox</div>
-        <div class="page-subtitle">Engine-drafted emails wait here until a team member approves them — unless a campaign is on autopilot</div>
+        <div class="page-subtitle">Engine-drafted emails wait here until a team member approves them, unless a campaign is on autopilot</div>
       </div>
       <div class="flex gap-8">
         <button class="btn btn-primary btn-sm" onclick="approveAllOutbox()">✓ Approve All Pending</button>
@@ -2855,7 +2855,7 @@ async function loadOutbox() {
   try {
     const data = await get('/api/outbox');
     const badge = document.getElementById('nav-outbox-badge');
-    if (badge) badge.textContent = (data.pending || []).length || '—';
+    if (badge) badge.textContent = (data.pending || []).length || ',';
 
     const card = (e, pending) => `
       <div class="card" style="margin-bottom:12px;">
@@ -2882,7 +2882,7 @@ async function loadOutbox() {
     el.innerHTML = `
       <div class="card-label" style="margin-bottom:10px;color:var(--orange);">Awaiting Approval (${(data.pending || []).length})</div>
       ${(data.pending || []).length ? data.pending.map(e => card(e, true)).join('') : `<div class="empty-state-sub" style="margin-bottom:20px;">Nothing waiting for approval.</div>`}
-      <div class="card-label" style="margin:20px 0 10px;color:var(--green);">Approved / Auto — sending on next tick (${(data.queued || []).length})</div>
+      <div class="card-label" style="margin:20px 0 10px;color:var(--green);">Approved / Auto, sending on next tick (${(data.queued || []).length})</div>
       ${(data.queued || []).length ? data.queued.map(e => card(e, false)).join('') : `<div class="empty-state-sub">Send queue is empty.</div>`}
     `;
   } catch (err) {
@@ -2893,7 +2893,7 @@ async function loadOutbox() {
 async function outboxAction(id, action) {
   try {
     await post(`/api/outbox/${id}/${action}`, {});
-    toast(action === 'approve' ? 'Approved — sends on next engine tick' : 'Cancelled', 'success');
+    toast(action === 'approve' ? 'Approved, sends on next engine tick' : 'Cancelled', 'success');
     loadOutbox();
   } catch (err) { toast(err.message, 'error'); }
 }
@@ -2901,7 +2901,7 @@ async function outboxAction(id, action) {
 async function approveAllOutbox() {
   try {
     const r = await post('/api/outbox/approve-all', {});
-    toast(`${r.approved} email(s) approved — they send on the next tick`, 'success');
+    toast(`${r.approved} email(s) approved, they send on the next tick`, 'success');
     loadOutbox();
   } catch (err) { toast(err.message, 'error'); }
 }
@@ -2918,8 +2918,8 @@ async function refreshEngineBadges() {
     state.engineStatus = status;
     updateEngineBadges(status);
     const badge = document.getElementById('nav-outbox-badge');
-    if (badge) badge.textContent = (outbox.pending || []).length || '—';
-  } catch { /* backend offline — badges stay as-is */ }
+    if (badge) badge.textContent = (outbox.pending || []).length || ',';
+  } catch { /* backend offline, badges stay as-is */ }
 }
 
 // ─── INIT ────────────────────────────────────────────────────────
@@ -2933,7 +2933,7 @@ async function initApp() {
 
 // ─── STARTUP ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  // Local preview mode — skip Vercel auth entirely
+  // Local preview mode, skip Vercel auth entirely
   if (localStorage.getItem('koaland_local_mode') === 'true') {
     LOCAL_MODE = true;
     seedLocalData();
@@ -2945,11 +2945,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const token = localStorage.getItem('koaland_token');
   const apiUrl = localStorage.getItem('koaland_api_url');
 
-  // Pre-fill lock screen if we have values
+  // Pre-fill lock screen. The frontend is served from the same origin as the
+  // API (locally and on Vercel), so default the endpoint to this origin. On
+  // localhost, prefill the documented dev token so the local server is one click.
   const apiInput = document.getElementById('lock-api');
   const tokenInput = document.getElementById('lock-token');
-  if (apiInput && apiUrl) apiInput.value = apiUrl;
-  if (tokenInput && token) tokenInput.value = token;
+  const isHttp = location.protocol === 'http:' || location.protocol === 'https:';
+  const isLocalhost = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  if (apiInput) apiInput.value = apiUrl || (isHttp ? location.origin : '');
+  if (tokenInput) tokenInput.value = token || (isLocalhost ? 'local-dev' : '');
+  const hint = document.getElementById('lock-hint');
+  if (hint && isLocalhost) hint.textContent = 'Local server detected. Endpoint and dev token are prefilled: click Access Intelligence OS.';
 
   if (token && apiUrl) {
     AUTH_TOKEN = token;

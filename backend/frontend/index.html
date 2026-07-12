@@ -15,7 +15,7 @@
   <div class="lock-brand">Koaland<span>.ai</span></div>
   <div class="lock-card">
     <h2>Prospect Intelligence OS</h2>
-    <p>Commercial radar for brand-sensitive hotels.<br>Enter your API endpoint and access token to continue.</p>
+    <p>Commercial radar for brand-sensitive hotels.<br>Confirm your endpoint and access token to continue.</p>
     <div class="form-group">
       <label class="form-label" style="text-align:left;display:block;">API Base URL</label>
       <input class="lock-input" id="lock-api" type="text" placeholder="https://your-app.vercel.app" style="text-align:left;letter-spacing:0;margin-bottom:10px;" />
@@ -30,17 +30,17 @@
     </button>
     <div style="display:flex;align-items:center;gap:10px;margin:18px 0 0;">
       <div style="flex:1;height:1px;background:rgba(244,239,227,0.08);"></div>
-      <div style="font-size:10px;letter-spacing:1px;color:var(--dim-text);text-transform:uppercase;">veya</div>
+      <div style="font-size:10px;letter-spacing:1px;color:var(--dim-text);text-transform:uppercase;">or</div>
       <div style="flex:1;height:1px;background:rgba(244,239,227,0.08);"></div>
     </div>
     <button class="btn btn-secondary" style="width:100%;margin-top:12px;padding:11px;font-size:12.5px;letter-spacing:0.3px;" onclick="handleLocalLogin()">
-      Vercel olmadan aç — Local Preview
+      Open in browser-only preview
     </button>
     <div style="margin-top:10px;font-size:10.5px;color:rgba(207,198,182,0.45);text-align:center;line-height:1.5;">
-      Tüm ekranlar çalışır · Veri tarayıcıda saklanır · E-posta simüle edilir
+      Every screen works. Data stays in your browser. Emails are simulated.
     </div>
-    <div style="margin-top:14px;font-size:11px;color:var(--dim-text);">
-      Deploy the backend to Vercel first — see README.md for instructions.
+    <div id="lock-hint" style="margin-top:14px;font-size:11px;color:var(--dim-text);">
+      Run the backend with <code>node local-server.js</code>, then use this endpoint and your DASHBOARD_ACCESS_TOKEN.
     </div>
   </div>
 </div>
@@ -69,7 +69,7 @@
     <div class="topbar-spacer"></div>
 
     <div class="topbar-followup">
-      <span class="count" id="followup-count">—</span> follow-ups due
+      <span class="count" id="followup-count">, </span> follow-ups due
     </div>
 
     <button class="btn-quick-add" onclick="openAddProspectModal()">+ Add Prospect</button>
@@ -113,7 +113,7 @@
     <div class="nav-item" data-screen="outbox" onclick="navigate('outbox')">
       <span class="nav-icon">▤</span>
       Outbox
-      <span class="nav-badge" id="nav-outbox-badge">—</span>
+      <span class="nav-badge" id="nav-outbox-badge">, </span>
     </div>
 
     <div class="nav-label" style="margin-top:8px;">Operations</div>
@@ -125,7 +125,7 @@
     <div class="nav-item" data-screen="followup-queue" onclick="navigate('followup-queue')">
       <span class="nav-icon">⚡</span>
       Follow-up Queue
-      <span class="nav-badge" id="nav-followup-badge">—</span>
+      <span class="nav-badge" id="nav-followup-badge">, </span>
     </div>
     <div class="nav-item" data-screen="analytics" onclick="navigate('analytics')">
       <span class="nav-icon">∿</span>

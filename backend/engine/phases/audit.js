@@ -1,7 +1,7 @@
 /**
  * Audit phase: auto-run one audit per tick per campaign for prospects that
  * finished research. One per tick keeps API cost and tick duration bounded.
- * createTask:false — the engine's outreach phase drafts the email itself.
+ * createTask:false, the engine's outreach phase drafts the email itself.
  */
 
 const { read } = require('../store');

@@ -42,7 +42,7 @@ function recalcHotLeadScore(prospectId) {
 
 function createTask(prospectId, type, title, reason, recommendedAction, dueInDays) {
   const tasks = read('tasks');
-  // one open task per type per prospect — don't spam the queue
+  // one open task per type per prospect, don't spam the queue
   if (tasks.some(t => t.prospectId === prospectId && t.type === type && t.status === 'open')) return null;
   const task = {
     id: lid('tsk'), prospectId, type, title, reason, recommendedAction,
@@ -124,9 +124,9 @@ function recordEvent({ type, emailId, prospectId, auditToken }) {
   // behavior-driven tasks and sequence control
   if (type === 'pdf_opened') {
     if (pdfOpenCount >= 2) {
-      createTask(prospectId, 'followup_hot_pdf', `⚡ HOT — ${prospect.hotelName} viewed the audit ${pdfOpenCount} times`, `Prospect viewed the audit report ${pdfOpenCount} times — strong buying signal.`, 'Reach out today. Mention the report resonated. Offer a short call.', 0);
+      createTask(prospectId, 'followup_hot_pdf', `⚡ HOT, ${prospect.hotelName} viewed the audit ${pdfOpenCount} times`, `Prospect viewed the audit report ${pdfOpenCount} times, strong buying signal.`, 'Reach out today. Mention the report resonated. Offer a short call.', 0);
     } else {
-      createTask(prospectId, 'followup_after_pdf_view', `Follow up with ${prospect.hotelName} — audit viewed`, 'Prospect viewed the audit report — signal of interest.', 'Follow up within 24 hours. Reference the report and ask for their reaction.', 1);
+      createTask(prospectId, 'followup_after_pdf_view', `Follow up with ${prospect.hotelName}, audit viewed`, 'Prospect viewed the audit report, signal of interest.', 'Follow up within 24 hours. Reference the report and ask for their reaction.', 1);
     }
     // pull the next automated follow-up forward to ride the interest
     const list = read('prospects');
@@ -138,11 +138,11 @@ function recordEvent({ type, emailId, prospectId, auditToken }) {
   }
   if (type === 'replied') {
     stopSequence(prospectId, 'replied');
-    createTask(prospectId, 'reply_received', `Reply from ${prospect.hotelName} — respond today`, 'Prospect replied to outreach.', 'Read the reply and respond personally within a few hours.', 0);
+    createTask(prospectId, 'reply_received', `Reply from ${prospect.hotelName}, respond today`, 'Prospect replied to outreach.', 'Read the reply and respond personally within a few hours.', 0);
   }
   if (type === 'bounced') {
     stopSequence(prospectId, 'bounced');
-    createTask(prospectId, 'contact_research', `Find better contact for ${prospect.hotelName} — email bounced`, 'The email bounced — contact address likely wrong or inactive.', 'Check LinkedIn, the hotel website, or the booking engine for a better address.', 1);
+    createTask(prospectId, 'contact_research', `Find better contact for ${prospect.hotelName}, email bounced`, 'The email bounced, contact address likely wrong or inactive.', 'Check LinkedIn, the hotel website, or the booking engine for a better address.', 1);
   }
   if (type === 'unsubscribed') stopSequence(prospectId, 'unsubscribed');
 

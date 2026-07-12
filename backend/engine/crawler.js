@@ -1,6 +1,6 @@
 /**
  * Website crawler shared by research, audits, and manual endpoints.
- * Extracted from local-server.js — behavior unchanged.
+ * Extracted from local-server.js, behavior unchanged.
  */
 
 let cheerio;

@@ -217,7 +217,7 @@ export function generateAuditHtml(data: AuditReportData): string {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Digital Experience Snapshot — ${data.hotelName}</title>
+<title>Digital Experience Snapshot, ${data.hotelName}</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap');
 
@@ -359,7 +359,7 @@ export function generateAuditHtml(data: AuditReportData): string {
   <!-- ABOUT -->
   <div class="section">
     <div class="section-label">About Koaland.ai</div>
-    <p>Koaland.ai is a commercial decision engine for brand-sensitive hotels. It observes digital and commercial signals, identifies real tradeoffs, and turns noisy data into clear decisions and next actions — so commercial teams can move faster and with more confidence.</p>
+    <p>Koaland.ai is a commercial decision engine for brand-sensitive hotels. It observes digital and commercial signals, identifies real tradeoffs, and turns noisy data into clear decisions and next actions, so commercial teams can move faster and with more confidence.</p>
     <p>This snapshot was generated from publicly available data. It is intended to identify potential signal areas, not to diagnose internal operations.</p>
   </div>
 

@@ -43,7 +43,7 @@ function heuristicPlan({ region, goal, segment, notes }) {
   const regionName = region || 'the target region';
   return {
     ...DEFAULT_CAMPAIGN,
-    name: `${regionName} — ${seg} outreach`,
+    name: `${regionName}, ${seg} outreach`,
     region: regionName,
     segment: seg,
     searchQueries: [

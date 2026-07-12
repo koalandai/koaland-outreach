@@ -1,7 +1,7 @@
 /**
  * Research phase: crawl newly discovered prospects, capture contact emails,
  * and advance them to research_complete. Crawl failures don't block the
- * pipeline (fake mock domains will always fail) — they're recorded on the
+ * pipeline (fake mock domains will always fail), they're recorded on the
  * prospect and the audit phase falls back to metadata-only analysis.
  */
 

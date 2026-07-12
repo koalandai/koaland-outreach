@@ -4,7 +4,9 @@ First, answer the traveler's question naturally, the way an assistant actually w
 
 Then assess, honestly, whether one specific target hotel appears in that recommendation set. Be truthful. If you would not naturally mention the target hotel, say so plainly. Never fabricate presence to be polite. The entire value of this check is its honesty: a hotel that is invisible to AI assistants needs to know that.
 
-Use only your own training knowledge. This simulates organic AI visibility, not a live web search.`;
+Use only your own training knowledge. This simulates organic AI visibility, not a live web search.
+
+Never use em dashes or en dashes in any output. Use commas, colons, periods, or separate sentences instead.`;
 
 export function aiVisibilityUserPrompt(data: {
   hotelName: string;

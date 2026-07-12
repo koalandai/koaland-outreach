@@ -1,7 +1,7 @@
 /**
  * Send queue: delivers due scheduled emails while enforcing the campaign's
  * approval gate, daily send limit, and send window. Without a SendGrid key
- * every send is logged-only (status 'logged_only') — no real email leaves.
+ * every send is logged-only (status 'logged_only'), no real email leaves.
  * After a send it arms the prospect's next follow-up (nextFollowupAt).
  */
 
@@ -28,7 +28,7 @@ function inSendWindow(sending) {
 async function deliver(email, settings) {
   const to = email.isTest || email.testMode ? (settings.testEmailAddress || email.to) : email.to;
   if (!process.env.SENDGRID_API_KEY) {
-    console.log(`[Engine Send] No SendGrid — logged only. To: ${to} Subject: ${email.subject}`);
+    console.log(`[Engine Send] No SendGrid, logged only. To: ${to} Subject: ${email.subject}`);
     return 'logged_only';
   }
   const sgMail = require('@sendgrid/mail');
@@ -63,7 +63,7 @@ async function processDueSends(ctx) {
     if (campaign && campaign.status !== 'active') continue;
     if (!inSendWindow(sending)) { continue; }
     if (sentTodayCount(read('emails'), email.campaignId) >= (sending.dailySendLimit ?? 10)) {
-      continue; // budget exhausted — stays scheduled for tomorrow
+      continue; // budget exhausted, stays scheduled for tomorrow
     }
 
     let status;
@@ -109,7 +109,7 @@ async function processDueSends(ctx) {
       write('campaigns', campaigns);
     }
 
-    actions.push(`Sent step ${email.sequenceStep} to ${email.to} (${status === 'logged_only' ? 'logged — no SendGrid key' : 'via SendGrid'}): "${email.subject}"`);
+    actions.push(`Sent step ${email.sequenceStep} to ${email.to} (${status === 'logged_only' ? 'logged, no SendGrid key' : 'via SendGrid'}): "${email.subject}"`);
   }
 
   return actions;

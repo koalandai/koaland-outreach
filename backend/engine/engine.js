@@ -2,7 +2,7 @@
  * Orchestration engine core.
  * A tick loop advances every active campaign through the pipeline phases:
  *   discovery → research → audit → outreach → followups, then global send queue.
- * All eligibility is derived from persisted status fields — ticks are idempotent
+ * All eligibility is derived from persisted status fields, ticks are idempotent
  * and restarts are safe. Phase modules are loaded lazily so the engine core can
  * run before every phase exists.
  */

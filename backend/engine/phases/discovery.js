@@ -2,8 +2,7 @@
  * Discovery phase: generate prospect hotels for a campaign's region.
  * Uses a real SERP provider when SERP_API_KEY is set; otherwise a region-seeded
  * mock generator so the pipeline is fully testable offline. Mock prospects get
- * an info@ contact email (their domains are fake, so research can't find one) —
- * harmless because without a SendGrid key all sends are logged-only.
+ * an info@ contact email (their domains are fake, so research can't find one),  * harmless because without a SendGrid key all sends are logged-only.
  */
 
 const { read, write, lid } = require('../store');
@@ -36,7 +35,7 @@ function mockDiscoveryResults(campaign, existingUrls) {
       hotelName: name,
       website,
       location: campaign.region,
-      snippet: `${name} — independent ${campaign.segment || 'boutique'} property in ${campaign.region}.`,
+      snippet: `${name}, independent ${campaign.segment || 'boutique'} property in ${campaign.region}.`,
       initialIcpFit: Math.round(50 + Math.random() * 45),
       contactEmail: `info@${slug}.com`,
       source: 'engine_discovery_mock',

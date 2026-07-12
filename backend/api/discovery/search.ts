@@ -50,7 +50,7 @@ function normalizeUrl(url: string): string {
 }
 
 function getSuggestedAction(result: any): string {
-  if (result.initialIcpFit >= 70) return 'Add to queue — high ICP fit';
+  if (result.initialIcpFit >= 70) return 'Add to queue, high ICP fit';
   if (result.initialIcpFit >= 50) return 'Research now';
   return 'Review manually';
 }

@@ -34,7 +34,7 @@ export async function createFollowUpAfterOpen(prospectId: string, emailId: strin
   return createTask({
     prospectId,
     type: 'followup_after_open',
-    title: `Follow up with ${prospect?.hotelName || 'prospect'} — email opened, no PDF view`,
+    title: `Follow up with ${prospect?.hotelName || 'prospect'}, email opened, no PDF view`,
     reason: 'Email was opened but prospect has not viewed the audit PDF yet.',
     recommendedAction: 'Send a short follow-up highlighting one specific finding from the audit.',
     dueAt: daysFromNow(2),
@@ -43,14 +43,14 @@ export async function createFollowUpAfterOpen(prospectId: string, emailId: strin
 
 export async function createFollowUpAfterPdfView(prospectId: string, auditId: string, openCount: number): Promise<Task> {
   const prospect = await storage.prospects.getById(prospectId) as any;
-  const urgency = openCount >= 2 ? '⚡ HOT — ' : '';
+  const urgency = openCount >= 2 ? '⚡ HOT, ' : '';
   return createTask({
     prospectId,
     type: openCount >= 2 ? 'followup_hot_pdf' : 'followup_after_pdf_view',
-    title: `${urgency}Follow up with ${prospect?.hotelName || 'prospect'} — PDF viewed${openCount >= 2 ? ` ${openCount} times` : ''}`,
+    title: `${urgency}Follow up with ${prospect?.hotelName || 'prospect'}, PDF viewed${openCount >= 2 ? ` ${openCount} times` : ''}`,
     reason: openCount >= 2
-      ? `Prospect viewed the audit PDF ${openCount} times — strong buying signal.`
-      : 'Prospect viewed the audit PDF — signal of interest.',
+      ? `Prospect viewed the audit PDF ${openCount} times, strong buying signal.`
+      : 'Prospect viewed the audit PDF, signal of interest.',
     recommendedAction: openCount >= 2
       ? 'Reach out today. Mention you noticed the PDF resonated. Offer a short call.'
       : 'Follow up within 24 hours. Reference the PDF and ask if they had a specific reaction.',
@@ -63,7 +63,7 @@ export async function createNoOpenFollowUp(prospectId: string, emailId: string):
   return createTask({
     prospectId,
     type: 'followup_no_open',
-    title: `Soft follow-up for ${prospect?.hotelName || 'prospect'} — email not opened`,
+    title: `Soft follow-up for ${prospect?.hotelName || 'prospect'}, email not opened`,
     reason: 'Email was sent 3+ days ago and has not been opened.',
     recommendedAction: 'Send a gentle follow-up with a different subject line. Try a specific finding hook.',
     dueAt: daysFromNow(0),
@@ -75,7 +75,7 @@ export async function createContactResearchTask(prospectId: string): Promise<Tas
   return createTask({
     prospectId,
     type: 'contact_research',
-    title: `Find better contact for ${prospect?.hotelName || 'prospect'} — email bounced`,
+    title: `Find better contact for ${prospect?.hotelName || 'prospect'}, email bounced`,
     reason: 'The email bounced. The contact address is likely incorrect or inactive.',
     recommendedAction: 'Research LinkedIn, hotel website, or booking engine for a better contact address.',
     dueAt: daysFromNow(1),

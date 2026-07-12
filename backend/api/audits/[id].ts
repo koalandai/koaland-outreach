@@ -8,7 +8,7 @@ export default withAuth(async (req: VercelRequest, res: VercelResponse) => {
   const { id } = req.query as { id: string };
 
   if (id === 'run') {
-    // Route to run endpoint — should not happen due to vercel.json routing
+    // Route to run endpoint, should not happen due to vercel.json routing
     return res.status(404).json({ error: 'Use POST /api/audits/run' });
   }
 

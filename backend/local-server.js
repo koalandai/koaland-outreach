@@ -1,5 +1,5 @@
 /**
- * Koaland Prospect Intelligence OS — Local Server
+ * Koaland Prospect Intelligence OS, Local Server
  * Run: node local-server.js
  * Open: http://localhost:3000
  * API URL: http://localhost:3000  |  Token: value of DASHBOARD_ACCESS_TOKEN in .env (default: local-dev)
@@ -102,7 +102,7 @@ app.post('/api/discovery/search', auth, async (req, res) => {
   ];
   res.json({ results: hotels.slice(0, Math.min(maxResults, 8)).map((h, i) => {
     const w = `https://www.${h.s}.com`;
-    return { hotelName:h.n, website:w, location:locs[i], snippet:`${h.n} — ${h.r} rooms, independent luxury in ${locs[i]}.`, initialIcpFit:Math.round(55+Math.random()*40), alreadyInDatabase:existingUrls.has(w) };
+    return { hotelName:h.n, website:w, location:locs[i], snippet:`${h.n}, ${h.r} rooms, independent luxury in ${locs[i]}.`, initialIcpFit:Math.round(55+Math.random()*40), alreadyInDatabase:existingUrls.has(w) };
   })});
 });
 
@@ -167,7 +167,7 @@ app.get('/api/audit/view/:token', (req, res) => {
   recordEvent({ type: 'pdf_opened', auditToken: req.params.token });
   const p = read('prospects').find(x => x.id === audit.prospectId) || { hotelName:'Hotel' };
   const rows = Object.entries(audit.scores||{}).map(([k,v])=>`<tr><td style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);text-transform:capitalize;color:#8B9BB4">${k.replace(/([A-Z])/g,' $1')}</td><td style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-weight:700;color:${v>=70?'#34D399':v>=50?'#FBBF24':'#F87171'}">${v}/100</td></tr>`).join('');
-  res.send(`<!DOCTYPE html><html><head><title>${p.hotelName} — Koaland Audit</title><meta charset="UTF-8"><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,-apple-system,sans-serif;background:#070D1A;color:#E8EDF5}header{background:#0F1829;padding:32px 48px;border-bottom:1px solid rgba(255,255,255,0.06)}.brand{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#4F8EF7;margin-bottom:10px}h1{font-size:26px;font-weight:600}main{max-width:760px;margin:48px auto;padding:0 24px}h2{font-size:15px;font-weight:600;color:#8B9BB4;letter-spacing:1px;text-transform:uppercase;margin:32px 0 14px}p{color:#8B9BB4;line-height:1.75;font-size:14px}table{width:100%;border-collapse:collapse;background:#0F1829;border-radius:12px;overflow:hidden;margin-bottom:24px}.angle{background:#162035;border:1px solid rgba(79,142,247,0.2);padding:16px 20px;border-radius:10px;color:#7CB3FF;font-size:14px}</style></head><body><header><div class="brand">Koaland.ai · Digital Experience Audit</div><h1>${p.hotelName}</h1></header><main><h2>Executive Summary</h2><p>${audit.executiveSummary}</p><h2>Scorecard</h2><table><tbody>${rows}</tbody></table><h2>Recommended Angle</h2><div class="angle">${audit.recommendedAngle}</div><h2>Outreach Hook</h2><p>${audit.oneSentenceHook}</p></main></body></html>`);
+  res.send(`<!DOCTYPE html><html><head><title>${p.hotelName}, Koaland Audit</title><meta charset="UTF-8"><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,-apple-system,sans-serif;background:#070D1A;color:#E8EDF5}header{background:#0F1829;padding:32px 48px;border-bottom:1px solid rgba(255,255,255,0.06)}.brand{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#4F8EF7;margin-bottom:10px}h1{font-size:26px;font-weight:600}main{max-width:760px;margin:48px auto;padding:0 24px}h2{font-size:15px;font-weight:600;color:#8B9BB4;letter-spacing:1px;text-transform:uppercase;margin:32px 0 14px}p{color:#8B9BB4;line-height:1.75;font-size:14px}table{width:100%;border-collapse:collapse;background:#0F1829;border-radius:12px;overflow:hidden;margin-bottom:24px}.angle{background:#162035;border:1px solid rgba(79,142,247,0.2);padding:16px 20px;border-radius:10px;color:#7CB3FF;font-size:14px}</style></head><body><header><div class="brand">Koaland.ai · Digital Experience Audit</div><h1>${p.hotelName}</h1></header><main><h2>Executive Summary</h2><p>${audit.executiveSummary}</p><h2>Scorecard</h2><table><tbody>${rows}</tbody></table><h2>Recommended Angle</h2><div class="angle">${audit.recommendedAngle}</div><h2>Outreach Hook</h2><p>${audit.oneSentenceHook}</p></main></body></html>`);
 });
 
 // ─── EMAIL GENERATION ────────────────────────────────────────────
@@ -231,8 +231,8 @@ app.get('/api/outbox', auth, (req, res) => {
     .filter(e => e.status === 'scheduled')
     .map(e => ({
       ...e,
-      prospectName: prospects.find(p => p.id === e.prospectId)?.hotelName || '—',
-      campaignName: campaigns.find(c => c.id === e.campaignId)?.name || '—',
+      prospectName: prospects.find(p => p.id === e.prospectId)?.hotelName || ', ',
+      campaignName: campaigns.find(c => c.id === e.campaignId)?.name || ', ',
     }))
     .sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt));
   res.json({
@@ -421,13 +421,13 @@ engine.resumeIfRunning(ENGINE_CTX);
 
 app.listen(PORT, () => {
   console.log('\n' + '═'.repeat(56));
-  console.log('  Koaland Prospect Intelligence OS — Local Server');
+  console.log('  Koaland Prospect Intelligence OS, Local Server');
   console.log('═'.repeat(56));
   console.log(`  URL:      http://localhost:${PORT}`);
   console.log(`  Token:    ${TOKEN}`);
   console.log(`  Storage:  ${STORAGE}`);
-  console.log(`  OpenAI:   ${process.env.OPENAI_API_KEY ? '✓ real AI audits & emails' : '✗ not set — add OPENAI_API_KEY to .env'}`);
-  console.log(`  SendGrid: ${process.env.SENDGRID_API_KEY ? '✓ real email sending' : '✗ not set — emails logged only'}`);
+  console.log(`  OpenAI:   ${process.env.OPENAI_API_KEY ? '✓ real AI audits & emails' : '✗ not set, add OPENAI_API_KEY to .env'}`);
+  console.log(`  SendGrid: ${process.env.SENDGRID_API_KEY ? '✓ real email sending' : '✗ not set, emails logged only'}`);
   console.log('═'.repeat(56));
   console.log(`\n  Open: http://localhost:${PORT}`);
   console.log(`  Or open frontend/index.html and enter:`);

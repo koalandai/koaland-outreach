@@ -25,7 +25,7 @@ async function run(campaign, ctx) {
         const list = read('prospects');
         const idx = list.findIndex(p => p.id === prospect.id);
         if (idx !== -1) { list[idx].needsContact = true; write('prospects', list); }
-        actions.push(`Outreach: ${prospect.hotelName} has no contact email — contact research task created`);
+        actions.push(`Outreach: ${prospect.hotelName} has no contact email, contact research task created`);
       }
       continue;
     }

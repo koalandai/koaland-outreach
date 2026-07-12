@@ -24,8 +24,8 @@ Open the dashboard → **Engine → Control Room** → **+ New Campaign** → en
 ### How it works
 
 - A tick loop (default 60s, `PATCH /api/engine/config`) advances every **active** campaign through phases with small per-tick batch caps: `discovery → research → audit → outreach → followups`, then a global send queue.
-- Phase eligibility comes from persisted prospect/email status — ticks are idempotent and restarts are safe (the loop resumes if it was running).
-- **Safety defaults:** `autoSend:false` (human approval required), per-campaign daily send limit (10) and send window (9–18h), sequences stop permanently on reply/bounce/unsubscribe, and without `SENDGRID_API_KEY` every send is `logged_only` — no real email leaves.
+- Phase eligibility comes from persisted prospect/email status, ticks are idempotent and restarts are safe (the loop resumes if it was running).
+- **Safety defaults:** `autoSend:false` (human approval required), per-campaign daily send limit (10) and send window (9-18h), sequences stop permanently on reply/bounce/unsubscribe, and without `SENDGRID_API_KEY` every send is `logged_only`, no real email leaves.
 - Audit-report views are tracked (`pdf_opened` events → hot-lead score, behavior tasks, follow-ups pulled forward). `POST /api/simulate/email/:id/:event` stands in for the SendGrid webhook locally (`delivered|opened|clicked|replied|bounced|unsubscribed`).
 
 ### Engine API
@@ -48,7 +48,7 @@ Campaign config lives on the campaign record: `region`, `searchQueries[]`, `targ
 ## What this is
 
 A full-stack outbound intelligence cockpit for Murat at Koaland.ai.  
-**Frontend:** open `frontend/index.html` in any browser — no build step, no npm.  
+**Frontend:** open `frontend/index.html` in any browser, no build step, no npm.  
 **Backend:** deployed to Vercel as serverless functions.  
 **Storage:** Vercel KV (Redis) for all persistent data.  
 
@@ -119,7 +119,7 @@ In SendGrid dashboard → Settings → Mail Settings → Event Webhook:
 
 ## Opening the Frontend
 
-1. Double-click `frontend/index.html` — it opens in your browser
+1. Double-click `frontend/index.html`, it opens in your browser
 2. On the lock screen, enter:
    - **API Base URL**: `https://your-app.vercel.app`
    - **Access Token**: the value of `DASHBOARD_ACCESS_TOKEN` you set
@@ -141,7 +141,7 @@ Select a prospect → click "Run Audit". The system:
 3. Sends all data to GPT-4o for structured analysis
 4. Generates scores across 7 dimensions
 5. Creates a branded HTML audit report
-6. Returns a tracking URL — when the prospect opens it, you get notified
+6. Returns a tracking URL, when the prospect opens it, you get notified
 
 ### Email Studio
 After running an audit, go to Email Studio → select the prospect → Generate Variants. The AI writes 3 email variants based on the strongest audit finding. Pick a subject line, review the body, send test or live.
@@ -172,7 +172,7 @@ To migrate to Supabase:
 1. Install `@supabase/supabase-js`
 2. Add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to env vars
 3. Replace the Vercel KV calls in `storageService.ts` with Supabase table operations
-4. The data models stay identical — just change the persistence backend
+4. The data models stay identical, just change the persistence backend
 5. The rest of the codebase (API endpoints, services) requires no changes
 
 ---
@@ -186,8 +186,8 @@ To migrate to Supabase:
 | `SENDGRID_API_KEY` | ✓ | Email sending |
 | `SENDGRID_FROM_EMAIL` | ✓ | Verified sender email |
 | `SENDGRID_FROM_NAME` | ✓ | Sender name (Murat) |
-| `KV_REST_API_URL` | ✓ | Vercel KV — auto-added when you connect KV |
-| `KV_REST_API_TOKEN` | ✓ | Vercel KV — auto-added when you connect KV |
+| `KV_REST_API_URL` | ✓ | Vercel KV, auto-added when you connect KV |
+| `KV_REST_API_TOKEN` | ✓ | Vercel KV, auto-added when you connect KV |
 | `TRACKING_BASE_URL` | ✓ | Your Vercel deployment URL (for PDF tracking links) |
 | `PAGESPEED_API_KEY` | optional | Google PageSpeed Insights API key (free) |
 | `SERP_API_KEY` | optional | SERP provider API key for Prospect Radar |
@@ -212,13 +212,13 @@ api/                       Vercel serverless functions (TypeScript)
   ├── research/prospect.ts POST /api/research/prospect
   ├── audits/run.ts        POST /api/audits/run
   ├── audits/[id].ts       GET/POST /api/audits/:id
-  ├── audit/view/[token]   GET — serves branded HTML report + logs view
-  ├── audit/download/[token] GET — serves report with print trigger
+  ├── audit/view/[token]   GET, serves branded HTML report + logs view
+  ├── audit/download/[token] GET, serves report with print trigger
   ├── emails/generate.ts   POST /api/emails/generate
   ├── emails/send.ts       POST /api/emails/send
   ├── emails/[id].ts       GET/PATCH
-  ├── webhooks/sendgrid.ts POST — receives SendGrid events
-  ├── r/[type]/[token].ts  GET — tracking redirects
+  ├── webhooks/sendgrid.ts POST, receives SendGrid events
+  ├── r/[type]/[token].ts  GET, tracking redirects
   ├── tasks/               GET/POST/PATCH
   ├── campaigns/           GET/POST
   ├── dashboard.ts         GET /api/dashboard

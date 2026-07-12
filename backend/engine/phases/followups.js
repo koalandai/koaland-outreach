@@ -96,7 +96,7 @@ async function run(campaign, ctx) {
       write('prospects', prospects);
     }
 
-    actions.push(`Follow-up: drafted ${nextStep.type} (step ${nextStep.step}) for ${prospect.hotelName} — ${signals.text} → ${autoSend ? 'auto-send queue' : 'Outbox'}`);
+    actions.push(`Follow-up: drafted ${nextStep.type} (step ${nextStep.step}) for ${prospect.hotelName}, ${signals.text} → ${autoSend ? 'auto-send queue' : 'Outbox'}`);
   }
 
   return actions;

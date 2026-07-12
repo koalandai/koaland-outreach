@@ -108,7 +108,7 @@ function extractHotelName(title: string): string {
   return title
     .split('|')[0]
     .split(' - ')[0]
-    .split(' – ')[0]
+    .split('-')[0]
     .replace(/official site/i, '')
     .trim();
 }

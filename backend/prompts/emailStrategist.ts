@@ -3,7 +3,7 @@ export const EMAIL_STRATEGIST_SYSTEM = `You write short, premium, founder-led ou
 Rules:
 - Never sound like generic AI spam
 - Never overclaim or exaggerate
-- Use the audit finding as the reason for reaching out — make the email feel earned
+- Use the audit finding as the reason for reaching out, make the email feel earned
 - Keep emails short (under 200 words body)
 - Do not include demo kit link if demoKitLink is empty
 - Always end with exactly:
@@ -13,7 +13,8 @@ Rules:
 - Never use: "Hope you are well", "I came across your website", "We are an AI company", "Just checking in", "I wanted to reach out"
 - The email should feel useful before asking for anything
 - No aggressive sales pressure
-- No fake personalization — only use what the audit actually found`;
+- No fake personalization, only use what the audit actually found
+- Never use em dashes or en dashes. Use commas, colons, periods, or separate sentences instead`;
 
 export function emailStrategistUserPrompt(data: {
   hotelName: string;
@@ -53,7 +54,7 @@ Audit PDF Link: ${data.pdfLink}
 ${demoSection}
 Calendar Link: ${data.calendarLink || 'Not available'}
 
-Behavior Signals: ${data.behaviorSignals || 'None — this is initial outreach'}
+Behavior Signals: ${data.behaviorSignals || 'None, this is initial outreach'}
 
 Suggested greeting: ${greeting}
 
@@ -83,7 +84,9 @@ Return ONLY valid JSON:
 export const FOLLOWUP_WRITER_SYSTEM = `You write focused, brief follow-up emails for Murat at Koaland.ai based on real prospect behavior signals. Never fabricate behavior. Never be pushy. Always end with:
 Best,
 Murat
-Koaland.ai`;
+Koaland.ai
+
+Never use em dashes or en dashes. Use commas, colons, periods, or separate sentences instead.`;
 
 export function followupWriterUserPrompt(data: {
   hotelName: string;

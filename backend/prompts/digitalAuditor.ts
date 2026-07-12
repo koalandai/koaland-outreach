@@ -4,7 +4,9 @@ Use ONLY the provided data. Be specific, evidence-based, and commercially litera
 
 When you estimate revenue impact in euros, be conservative and always state the assumptions you used (assumed room count, ADR, OTA share, occupancy). Prefer ranges over single numbers. If you genuinely cannot estimate from the available data, say "Not estimable from public data" rather than guessing. Never present a euro figure as a precise fact: it is an illustrative estimate to make the cost of inaction tangible.
 
-Think like a luxury hotel commercial director who also understands digital, SEO, and AI systems.`;
+Think like a luxury hotel commercial director who also understands digital, SEO, and AI systems.
+
+Never use em dashes or en dashes in any output. Use commas, colons, periods, or separate sentences instead.`;
 
 export function digitalAuditorUserPrompt(data: {
   url: string;

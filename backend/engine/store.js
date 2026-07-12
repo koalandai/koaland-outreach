@@ -1,6 +1,6 @@
 /**
  * Shared file-JSON storage for the local server and the orchestration engine.
- * One source of truth — local-server.js and every engine module require this.
+ * One source of truth, local-server.js and every engine module require this.
  */
 
 const fs = require('fs');

@@ -117,7 +117,7 @@ export default withAuth(async (req: VercelRequest, res: VercelResponse) => {
   }
   if (pdfOpened > 0 && opened > 0) {
     const pdfToReply = Math.round((replied / (pdfOpened || 1)) * 100);
-    if (pdfToReply > 20) insights.push(`PDF view → reply conversion is ${pdfToReply}% — strong signal. Prioritize PDF-viewed prospects.`);
+    if (pdfToReply > 20) insights.push(`PDF view → reply conversion is ${pdfToReply}%, strong signal. Prioritize PDF-viewed prospects.`);
   }
 
   res.json({
