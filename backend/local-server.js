@@ -90,20 +90,19 @@ app.post('/api/discovery/search', auth, async (req, res) => {
   if (process.env.SERP_API_KEY) {
     try {
       const results = await runSerpSearch(query, location, maxResults, process.env.SERP_API_KEY, process.env.SERP_PROVIDER || 'serpapi', existingUrls);
-      return res.json({ results });
-    } catch (err) { console.warn('[SERP] Error:', err.message); }
+      return res.json({ results, live: true });
+    } catch (err) {
+      console.warn('[SERP] Error:', err.message);
+      return res.json({ results: [], live: true, notice: `Live search failed: ${err.message}. Check your SERP_API_KEY and provider.` });
+    }
   }
-  const locs = location ? Array(8).fill(location) : ['Santorini, Greece','Bodrum, Turkey','Amalfi Coast, Italy','Mykonos, Greece','Capri, Italy','Dubrovnik, Croatia','Kotor, Montenegro','Oia, Greece'];
-  const hotels = [
-    { n:'Villa Konak Boutique Hotel', s:'villakonakhotel', r:14 }, { n:'The Olive & Stone Hotel', s:'olivestonehotel', r:18 },
-    { n:'Maison de la Mer', s:'maisondelamer', r:12 }, { n:'Elia Boutique Hotel', s:'eliaboutiquehotel', r:22 },
-    { n:'Casa Primavera', s:'casaprimavera', r:10 }, { n:'Terrazzo Mare Hotel', s:'terrazzomarehotel', r:16 },
-    { n:'The Grand Terrace', s:'thegrandterrace', r:28 }, { n:'Blue Lagoon Estate', s:'bluelagoonestate', r:8 },
-  ];
-  res.json({ results: hotels.slice(0, Math.min(maxResults, 8)).map((h, i) => {
-    const w = `https://www.${h.s}.com`;
-    return { hotelName:h.n, website:w, location:locs[i], snippet:`${h.n}, ${h.r} rooms, independent luxury in ${locs[i]}.`, initialIcpFit:Math.round(55+Math.random()*40), alreadyInDatabase:existingUrls.has(w) };
-  })});
+  // No search source configured. Never fabricate prospects: honesty is the brand.
+  // Real hotels only, or the user adds one manually.
+  return res.json({
+    results: [],
+    live: false,
+    notice: 'Live discovery is off. Add a real search key (SERP_API_KEY) in backend/.env to find hotels, or add a prospect manually with + Add Prospect.',
+  });
 });
 
 async function runSerpSearch(query, location, max, key, provider, existingUrls) {

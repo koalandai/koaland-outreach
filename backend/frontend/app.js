@@ -102,34 +102,10 @@ function mockEmailVariants(prospect) {
   };
 }
 
-function mockSerpResults(query, location, maxResults) {
-  const locs = location
-    ? [location, location, location, location, location, location, location, location]
-    : ['Santorini, Greece', 'Bodrum, Turkey', 'Amalfi Coast, Italy', 'Mykonos, Greece', 'Capri, Italy', 'Dubrovnik, Croatia', 'Kotor, Montenegro', 'Oia, Greece'];
-  const hotels = [
-    { name: 'Villa Konak Boutique Hotel', slug: 'villakonakhotel', rooms: 14 },
-    { name: 'The Olive & Stone Hotel', slug: 'olivestonehotel', rooms: 18 },
-    { name: 'Maison de la Mer', slug: 'maisondelamer', rooms: 12 },
-    { name: 'Elia Boutique Hotel', slug: 'eliaboutiquehotel', rooms: 22 },
-    { name: 'Casa Primavera', slug: 'casaprimavera', rooms: 10 },
-    { name: 'Terrazzo Mare Hotel', slug: 'terrazzomarehotel', rooms: 16 },
-    { name: 'The Grand Terrace', slug: 'thegrandterrace', rooms: 28 },
-    { name: 'Blue Lagoon Estate', slug: 'bluelagoonestate', rooms: 8 },
-  ];
-  const existingUrls = new Set(localDB.get('prospects').map(p => p.website));
-  const count = Math.min(maxResults || 8, hotels.length);
-  return hotels.slice(0, count).map((h, i) => {
-    const loc = locs[i % locs.length];
-    const website = `https://www.${h.slug}.com`;
-    return {
-      hotelName: h.name,
-      website,
-      location: loc,
-      snippet: `${h.name}, a curated collection of ${h.rooms} rooms offering personalized luxury in ${loc}. Award-winning design, independent ownership, direct booking available.`,
-      initialIcpFit: Math.round(55 + Math.random() * 40),
-      alreadyInDatabase: existingUrls.has(website),
-    };
-  });
+// Browser-only preview has no live search source. Never fabricate prospects:
+// honesty is the brand. Real hotels come from a connected backend + SERP key.
+function mockSerpResults() {
+  return [];
 }
 
 // ─── SEED LOCAL DATA ─────────────────────────────────────────────
@@ -267,8 +243,11 @@ async function localApi(method, path, body) {
   }
 
   if (path === '/api/discovery/search') {
-    const results = mockSerpResults(body.query, body.location, body.maxResults);
-    return { results };
+    return {
+      results: [],
+      live: false,
+      notice: 'Browser-only preview cannot search for real hotels. Connect the backend with a search key (SERP_API_KEY), or add a prospect manually with + Add Prospect.',
+    };
   }
 
   if (path === '/api/research/prospect') {
@@ -555,13 +534,13 @@ function setLoading(key, val) {
 }
 
 function formatDate(iso) {
-  if (!iso) return ',';
+  if (!iso) return 'Not set';
   const d = new Date(iso);
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 function relativeTime(iso) {
-  if (!iso) return ',';
+  if (!iso) return 'Not yet';
   const diff = Date.now() - new Date(iso).getTime();
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return 'just now';
@@ -899,7 +878,13 @@ async function runRadarSearch() {
     state.discoveryResults = data.results;
 
     if (data.results.length === 0) {
-      results.innerHTML = `<div class="empty-state"><div class="empty-state-icon">◎</div><div class="empty-state-title">No prospects found</div><div class="empty-state-sub">Try a broader search query or different location.</div></div>`;
+      if (data.live === false && data.notice) {
+        results.innerHTML = `<div class="empty-state"><div class="empty-state-icon">◎</div><div class="empty-state-title">Live discovery is off</div><div class="empty-state-sub">${data.notice}</div><button class="btn btn-primary" style="margin-top:18px;" onclick="openAddProspectModal()">+ Add Prospect manually</button></div>`;
+      } else if (data.notice) {
+        results.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠</div><div class="empty-state-title">Search unavailable</div><div class="empty-state-sub">${data.notice}</div></div>`;
+      } else {
+        results.innerHTML = `<div class="empty-state"><div class="empty-state-icon">◎</div><div class="empty-state-title">No hotels found</div><div class="empty-state-sub">No real results for that query. Try a broader search or a different location.</div></div>`;
+      }
       return;
     }
 
@@ -1050,7 +1035,7 @@ function buildProspectRow(p) {
         <div class="td-hotel">${p.hotelName}</div>
         <div class="text-dim" style="font-size:11px;">${p.website ? `<a href="${p.website}" target="_blank" onclick="event.stopPropagation()">${p.website.replace('https://','').replace('www.','').slice(0,30)}</a>` : ','}</div>
       </td>
-      <td>${p.location || ','}</td>
+      <td>${p.location || '-'}</td>
       <td>${icpTier(p.icpFitScore || 0)}</td>
       <td>${p.commercialUpsideScore ? `<span style="color:${scoreColor(p.commercialUpsideScore)}">${p.commercialUpsideScore}</span>` : ','}</td>
       <td>${signalPill(p.hotLeadScore || 0)}</td>
@@ -1100,12 +1085,12 @@ async function openProspectDetail(id) {
       </div>
 
       <div class="detail-field"><div class="detail-field-label">Website</div><div class="detail-field-value">${p.website ? `<a href="${p.website}" target="_blank">${p.website} ↗</a>` : ','}</div></div>
-      <div class="detail-field"><div class="detail-field-label">Location</div><div class="detail-field-value">${p.location || ','}</div></div>
-      <div class="detail-field"><div class="detail-field-label">Segment</div><div class="detail-field-value">${p.segment || ','}</div></div>
-      <div class="detail-field"><div class="detail-field-label">Contact Email</div><div class="detail-field-value">${p.contactEmail || ','}</div></div>
-      <div class="detail-field"><div class="detail-field-label">Contact Person</div><div class="detail-field-value">${p.contactPerson || ','}</div></div>
-      <div class="detail-field"><div class="detail-field-label">Recommended Angle</div><div class="detail-field-value text-gold">${p.recommendedAngle || ','}</div></div>
-      <div class="detail-field"><div class="detail-field-label">Notes</div><div class="detail-field-value">${p.notes || ','}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Location</div><div class="detail-field-value">${p.location || '-'}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Segment</div><div class="detail-field-value">${p.segment || '-'}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Contact Email</div><div class="detail-field-value">${p.contactEmail || '-'}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Contact Person</div><div class="detail-field-value">${p.contactPerson || '-'}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Recommended Angle</div><div class="detail-field-value text-gold">${p.recommendedAngle || '-'}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Notes</div><div class="detail-field-value">${p.notes || '-'}</div></div>
 
       ${latestAudit ? `
         <div class="separator"></div>
@@ -1363,7 +1348,7 @@ function buildAuditResult(data) {
             </div>
             <div class="flex-1">
               <div class="text-dim" style="font-size:12px;margin-bottom:6px;">Recommended angle:</div>
-              <div style="font-size:13px;color:var(--gold);">${data.recommendedAngle || ','}</div>
+              <div style="font-size:13px;color:var(--gold);">${data.recommendedAngle || '-'}</div>
             </div>
           </div>
         </div>
@@ -1526,7 +1511,7 @@ async function loadEmailContext() {
 
     contextEl.innerHTML = `
       <div class="detail-field"><div class="detail-field-label">Hotel</div><div class="detail-field-value">${p.hotelName}</div></div>
-      <div class="detail-field"><div class="detail-field-label">Location</div><div class="detail-field-value">${p.location || ','}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Location</div><div class="detail-field-value">${p.location || '-'}</div></div>
       <div class="detail-field"><div class="detail-field-label">To Email</div><div class="detail-field-value">${p.contactEmail || '<span class="text-dim">Not set</span>'}</div></div>
       <div class="detail-field"><div class="detail-field-label">Status</div><div class="detail-field-value">${statusBadge(p.status)}</div></div>
       ${latestAudit ? `
@@ -1536,7 +1521,7 @@ async function loadEmailContext() {
         <div style="margin-top:10px;"><a href="${latestAudit.pdfUrl}" target="_blank" class="btn btn-gold btn-xs">View Audit ↗</a></div>
         <div class="separator"></div>
         <div class="detail-field-label" style="margin-bottom:6px;">Recommended Angle</div>
-        <div style="font-size:12px;color:var(--gold);">${latestAudit.recommendedAngle || ','}</div>
+        <div style="font-size:12px;color:var(--gold);">${latestAudit.recommendedAngle || '-'}</div>
       ` : `<div class="separator"></div><div class="text-dim" style="font-size:12px;">No audit yet. <a href="#" onclick="openAuditFor('${p.id}')">Run audit first</a></div>`}
     `;
   } catch (err) {
@@ -1624,8 +1609,8 @@ function renderEmailVariants(variants, selectedIdx) {
     <div class="strength-row"><span class="strength-label">Clarity</span><span class="strength-val" style="color:${scoreColor(ss.clarity||0)}">${ss.clarity || 0}/100</span></div>
     <div class="strength-row"><span class="strength-label">Commercial Hook</span><span class="strength-val" style="color:${scoreColor(ss.commercialHook||0)}">${ss.commercialHook || 0}/100</span></div>
     <div class="strength-row"><span class="strength-label">Length</span><span class="strength-val">${ss.lengthScore || 0}/100</span></div>
-    <div class="strength-row"><span class="strength-label">Spam Risk</span><span class="strength-val ${ss.spamRisk === 'low' ? 'text-green' : ss.spamRisk === 'high' ? 'text-danger' : ''}">${ss.spamRisk || ','}</span></div>
-    <div class="strength-row"><span class="strength-label">CTA Strength</span><span class="strength-val">${ss.ctaStrength || ','}</span></div>
+    <div class="strength-row"><span class="strength-label">Spam Risk</span><span class="strength-val ${ss.spamRisk === 'low' ? 'text-green' : ss.spamRisk === 'high' ? 'text-danger' : ''}">${ss.spamRisk || '-'}</span></div>
+    <div class="strength-row"><span class="strength-label">CTA Strength</span><span class="strength-val">${ss.ctaStrength || '-'}</span></div>
   `;
 }
 
@@ -1832,10 +1817,10 @@ function buildCampaignContactRows(campaignId, contacts) {
 
   const rows = contacts.map(ct => `
     <tr>
-      <td><div style="font-weight:500;color:var(--text);">${ct.hotelName || ','}</div>${ct.location ? `<div style="font-size:11px;color:var(--dim-text);">${ct.location}</div>` : ''}</td>
-      <td>${ct.contactName || ','}</td>
-      <td><span style="color:var(--muted-text);font-size:12px;">${ct.email || ','}</span></td>
-      <td>${ct.role || ','}</td>
+      <td><div style="font-weight:500;color:var(--text);">${ct.hotelName || '-'}</div>${ct.location ? `<div style="font-size:11px;color:var(--dim-text);">${ct.location}</div>` : ''}</td>
+      <td>${ct.contactName || '-'}</td>
+      <td><span style="color:var(--muted-text);font-size:12px;">${ct.email || '-'}</span></td>
+      <td>${ct.role || '-'}</td>
       <td><span class="contact-status ${ct.status||'not_sent'}">${formatContactStatus(ct.status)}</span></td>
       <td onclick="event.stopPropagation()">
         <div class="flex gap-6">
@@ -2182,12 +2167,12 @@ async function loadContacts() {
             ${contacts.map(c => `
               <tr>
                 <td>
-                  <div style="font-weight:500;color:var(--text);">${c.hotelName || ','}</div>
+                  <div style="font-weight:500;color:var(--text);">${c.hotelName || '-'}</div>
                   ${c.location ? `<div style="font-size:11px;color:var(--dim-text);">${c.location}</div>` : ''}
                 </td>
-                <td>${c.contactName || ','}</td>
-                <td><span style="color:var(--muted-text);font-size:12px;">${c.email || ','}</span></td>
-                <td>${c.role || ','}</td>
+                <td>${c.contactName || '-'}</td>
+                <td><span style="color:var(--muted-text);font-size:12px;">${c.email || '-'}</span></td>
+                <td>${c.role || '-'}</td>
                 <td>${c.campaignId && campMap[c.campaignId] ? `<span class="tag tag-blue" style="font-size:11px;">${campMap[c.campaignId]}</span>` : '<span class="text-dim">,</span>'}</td>
                 <td><span class="contact-status ${c.status || 'not_sent'}">${formatContactStatus(c.status)}</span></td>
                 <td>
@@ -2685,7 +2670,7 @@ function buildEngineCampaignCard(c) {
       <div class="flex" style="justify-content:space-between;align-items:flex-start;">
         <div>
           <div style="font-weight:600;font-size:15px;">${c.name}</div>
-          <div style="font-size:12px;color:var(--muted-text);margin-top:2px;">${c.region || ','} · ${c.segment || 'boutique'}</div>
+          <div style="font-size:12px;color:var(--muted-text);margin-top:2px;">${c.region || '-'} · ${c.segment || 'boutique'}</div>
         </div>
         ${statusTag}
       </div>
@@ -2855,7 +2840,7 @@ async function loadOutbox() {
   try {
     const data = await get('/api/outbox');
     const badge = document.getElementById('nav-outbox-badge');
-    if (badge) badge.textContent = (data.pending || []).length || ',';
+    if (badge) badge.textContent = (data.pending || []).length || '0';
 
     const card = (e, pending) => `
       <div class="card" style="margin-bottom:12px;">
@@ -2918,7 +2903,7 @@ async function refreshEngineBadges() {
     state.engineStatus = status;
     updateEngineBadges(status);
     const badge = document.getElementById('nav-outbox-badge');
-    if (badge) badge.textContent = (outbox.pending || []).length || ',';
+    if (badge) badge.textContent = (outbox.pending || []).length || '0';
   } catch { /* backend offline, badges stay as-is */ }
 }
 
@@ -2932,7 +2917,25 @@ async function initApp() {
 }
 
 // ─── STARTUP ─────────────────────────────────────────────────────
+// ─── THEME ──────────────────────────────────────────────────────
+function syncThemeIcon() {
+  const btn = document.getElementById('theme-toggle');
+  if (!btn) return;
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  // Show the icon for the mode you switch TO.
+  btn.textContent = isLight ? '☾' : '☀';
+  btn.title = isLight ? 'Switch to dark' : 'Switch to light';
+}
+function toggleTheme() {
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  const next = isLight ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('koaland_theme', next);
+  syncThemeIcon();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  syncThemeIcon();
   // Local preview mode, skip Vercel auth entirely
   if (localStorage.getItem('koaland_local_mode') === 'true') {
     LOCAL_MODE = true;

@@ -6,13 +6,26 @@
   <title>Koaland · Prospect Intelligence OS</title>
   <meta name="description" content="Commercial radar for brand-sensitive hotels. Research · Audit · Score · Outreach · Track.">
   <link rel="stylesheet" href="styles.css">
+  <script>
+    // Apply saved theme before first paint to avoid a flash.
+    (function () {
+      var t = localStorage.getItem('koaland_theme');
+      if (t !== 'light' && t !== 'dark') {
+        t = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      }
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23315C46'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-size='14' fill='%23F4EFE3' font-family='serif'>K</text></svg>">
 </head>
 <body>
 
 <!-- ─── LOCK SCREEN ─────────────────────────────────────────────── -->
 <div id="lock-screen">
-  <div class="lock-brand">Koaland<span>.ai</span></div>
+  <div class="lock-brand">
+    <img src="koaland-logo-mark.png" alt="koaland.ai" class="lock-logo" />
+    <span class="lock-wordmark">koaland<span>.ai</span></span>
+  </div>
   <div class="lock-card">
     <h2>Prospect Intelligence OS</h2>
     <p>Commercial radar for brand-sensitive hotels.<br>Confirm your endpoint and access token to continue.</p>
@@ -29,14 +42,14 @@
       Access Intelligence OS
     </button>
     <div style="display:flex;align-items:center;gap:10px;margin:18px 0 0;">
-      <div style="flex:1;height:1px;background:rgba(244,239,227,0.08);"></div>
+      <div style="flex:1;height:1px;background:var(--border);"></div>
       <div style="font-size:10px;letter-spacing:1px;color:var(--dim-text);text-transform:uppercase;">or</div>
-      <div style="flex:1;height:1px;background:rgba(244,239,227,0.08);"></div>
+      <div style="flex:1;height:1px;background:var(--border);"></div>
     </div>
     <button class="btn btn-secondary" style="width:100%;margin-top:12px;padding:11px;font-size:12.5px;letter-spacing:0.3px;" onclick="handleLocalLogin()">
       Open in browser-only preview
     </button>
-    <div style="margin-top:10px;font-size:10.5px;color:rgba(207,198,182,0.45);text-align:center;line-height:1.5;">
+    <div style="margin-top:10px;font-size:10.5px;color:var(--dim-text);text-align:center;line-height:1.5;">
       Every screen works. Data stays in your browser. Emails are simulated.
     </div>
     <div id="lock-hint" style="margin-top:14px;font-size:11px;color:var(--dim-text);">
@@ -69,9 +82,10 @@
     <div class="topbar-spacer"></div>
 
     <div class="topbar-followup">
-      <span class="count" id="followup-count">, </span> follow-ups due
+      <span class="count" id="followup-count">0</span> follow-ups due
     </div>
 
+    <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle light / dark" aria-label="Toggle light or dark mode">☾</button>
     <button class="btn-quick-add" onclick="openAddProspectModal()">+ Add Prospect</button>
   </header>
 
@@ -113,7 +127,7 @@
     <div class="nav-item" data-screen="outbox" onclick="navigate('outbox')">
       <span class="nav-icon">▤</span>
       Outbox
-      <span class="nav-badge" id="nav-outbox-badge">, </span>
+      <span class="nav-badge" id="nav-outbox-badge">0</span>
     </div>
 
     <div class="nav-label" style="margin-top:8px;">Operations</div>
@@ -125,7 +139,7 @@
     <div class="nav-item" data-screen="followup-queue" onclick="navigate('followup-queue')">
       <span class="nav-icon">⚡</span>
       Follow-up Queue
-      <span class="nav-badge" id="nav-followup-badge">, </span>
+      <span class="nav-badge" id="nav-followup-badge">0</span>
     </div>
     <div class="nav-item" data-screen="analytics" onclick="navigate('analytics')">
       <span class="nav-icon">∿</span>
@@ -142,7 +156,7 @@
     <!-- Sidebar footer -->
     <div style="padding:24px 16px 8px;margin-top:auto;">
       <div style="font-size:10px;letter-spacing:1px;color:var(--dim-text);text-transform:uppercase;">Koaland.ai</div>
-      <div style="font-size:11px;color:rgba(207,198,182,0.4);margin-top:4px;line-height:1.5;">Commercial decision engine for brand-sensitive hotels</div>
+      <div style="font-size:11px;color:var(--dim-text);margin-top:4px;line-height:1.5;">Commercial decision engine for brand-sensitive hotels</div>
     </div>
   </nav>
 

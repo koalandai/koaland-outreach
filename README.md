@@ -29,8 +29,8 @@ Copy `backend/.env.example` to `backend/.env` and fill in what you want live. `.
 ## Layout
 
 - `backend/`: the live app. `local-server.js` (Express dev server), `frontend/` (the cockpit UI it serves), `engine/` (the acquisition engine), `api/` (Vercel serverless routes), `prompts/`, `services/`.
-- `index.html`, `style.css` (repo root): the legacy standalone dashboard, kept for reference. The current cockpit is `backend/frontend/`.
-- `docs/`: supporting notes.
+- `docs/`: plans and specs.
+- `legacy/`: the pre-engine standalone dashboard, kept for reference only (see `legacy/NOTE.md`). Nothing in the build uses it.
 
 ## The acquisition engine
 
