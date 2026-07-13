@@ -645,14 +645,8 @@ function pageHeader(eyebrow, title, sub, rightHTML=''){
 
 // ── PROSPECT RADAR ─────────────────────────────────────────
 function renderProspectRadar(){
-  const candidates = [
-    { name:'Aria Sanctuary, Bodrum', loc:'Turkey · Aegean', rooms:32, brand:'Boutique resort', signal:78, why:'Top-quartile reviews, weak schema markup, OTA-heavy distribution' },
-    { name:'Casa di Mare', loc:'Italy · Amalfi Coast', rooms:21, brand:'Cliffside boutique', signal:71, why:'No structured data, premium positioning, Italian-only site' },
-    { name:'Estate Lavanda', loc:'Croatia · Hvar', rooms:14, brand:'Estate villa', signal:69, why:'Niche luxury, no booking engine optimisation, growing DACH search' },
-    { name:'Maison Lumière', loc:'France · Provence', rooms:18, brand:'Vineyard hotel', signal:65, why:'Strong brand, fragmented digital presence, Q3 demand window' },
-    { name:'The Iris House', loc:'UK · Cotswolds', rooms:11, brand:'Manor estate', signal:62, why:'Premium ADR potential, no FAQ schema, weak mobile experience' },
-    { name:'Atoll Lily Resort', loc:'Maldives · Baa Atoll', rooms:42, brand:'Overwater villas', signal:58, why:'Strong inventory, slow page speed, missing review structured data' },
-  ];
+  // No fabricated candidates. Real hotels only appear after a live discovery run.
+  const candidates = [];
   document.querySelector('.content').innerHTML = `
     ${pageHeader('Discovery', 'Prospect Radar', 'Source new luxury hotels by signal strength and commercial fit.')}
     <div class="panel" style="margin-bottom:16px;">
@@ -667,6 +661,13 @@ function renderProspectRadar(){
     </div>
     <div class="panel">
       <div class="panel-head"><div class="panel-title"><i data-lucide="radar" style="width:16px;height:16px;"></i> Candidates (${candidates.length})</div><span class="panel-sub">Ranked by composite commercial fit</span></div>
+      ${candidates.length === 0 ? `
+        <div style="text-align:center;padding:48px 24px;color:#6b7280;">
+          <i data-lucide="radar" style="width:28px;height:28px;color:#9ca3af;"></i>
+          <div style="font-size:14px;font-weight:700;color:#111827;margin:12px 0 4px;">No candidates yet</div>
+          <div style="font-size:12px;line-height:1.6;">Set your filters and click <strong>Run Discovery</strong> to source real hotels. Nothing here is pre-populated.</div>
+        </div>
+      ` : `
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px;">
         ${candidates.map(c => `
           <div style="border:1px solid #ececf2;border-radius:11px;padding:16px;background:#fafbfd;transition:all 160ms;">
@@ -685,6 +686,7 @@ function renderProspectRadar(){
             <button class="btn btn-primary" style="width:100%;font-size:12px;padding:8px;" onclick="addRadarProspect('${c.name.replace(/'/g, "\\'")}', '${c.loc}')"><i data-lucide="plus" style="width:12px;height:12px;"></i> Add to Pipeline</button>
           </div>`).join('')}
       </div>
+      `}
     </div>
   `;
 }
