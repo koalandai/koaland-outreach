@@ -17,8 +17,8 @@ export async function recalculateHotLeadScore(prospectId: string): Promise<HotLe
   const settings = await storage.settings.get();
   const w = settings.hotLeadScoreWeights;
 
-  const emails = await storage.emails.findWhere((e: any) => e.prospectId === prospectId);
-  const audits = await storage.audits.findWhere((a: any) => a.prospectId === prospectId);
+  const emails = await storage.emails.findWhere((e: any) => e.prospectId === prospectId) as any[];
+  const audits = await storage.audits.findWhere((a: any) => a.prospectId === prospectId) as any[];
   const prospect = await storage.prospects.getById(prospectId) as any;
 
   let score = 0;
